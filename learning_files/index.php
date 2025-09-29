@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <a href="../tamamitsune.html">哈哈</a>
-        <br>
-        <a href="PHP Basic">PHP Basic</a>
+        <?php
+        echo "<a href=\"../tamamitsune.html\">哈哈</a>";
+        echo "<br>";
+        echo "<a href=\"PHP Basic\">PHP Basic</a>";
+        ?>
     </body>
 </html>
