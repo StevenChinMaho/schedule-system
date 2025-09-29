@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
     <head>
         <meta charset="UTF-8">
-        <h1>I Feel Good</h6>
+        <?php echo "<h1>I Feel Good</h6>" ?>
     </head>
     <body>
         <p>
