@@ -1,30 +1,29 @@
 <?php
-    require_once("config.php");
+    require_once("includes/config.php");
 
     if ( empty($_POST['name']) || empty($_POST['age']) )
     {
         echo "你少填了啦 阿齁<br>";
-        echo "<a href=\"index.php\">點我回去</a>";
+        echo "<a href=\"index.html\">點我回去</a>";
         exit();
     }
     else
     {
         echo "你好啊 " . $_POST['name'] . "，聽說你 " . $_POST['age'] . " 歲！<br>";
 
-        print_r($_POST);
-
         $name = $_POST['name'];
-        $age = $_POST['age'];
+        $age = (int)$_POST['age'];
 
-        $sql = sprintf( "INSERT INTO test( name, age ) VALUES ( '%s', %s )", $name, $age );
+        // $sql = sprintf( "INSERT INTO test( name, age ) VALUES ( '%s', %s )", $name, $age );
 
-        $stmt = $conn->prepare("INSERT INTO test( name, age ) VALUES ( ?, ? )");
-        $stmt->bind_param("si", $name, $age);
-        $stmt->execute();
+        $stmt = $pdo->prepare("INSERT INTO test( name, age ) VALUES ( ?, ? )");
+        // $stmt->bindParam();
+        $stmt->execute([$name, $age]);
 
         if (!$stmt) {
             die($conn->error);
         }
-        $stmt->close();
+
+        $stmt = NULL;
     }
 ?>
