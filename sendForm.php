@@ -18,12 +18,13 @@
 
         $sql = sprintf( "INSERT INTO test( name, age ) VALUES ( '%s', %s )", $name, $age );
 
-        $result = $conn -> query( $sql );
+        $stmt = $conn->prepare("INSERT INTO test( name, age ) VALUES ( ?, ? )");
+        $stmt->bind_param("si", $name, $age);
+        $stmt->execute();
 
-        if( !$result ) {
-            die( $conn -> error );
+        if (!$stmt) {
+            die($conn->error);
         }
-
-        
+        $stmt->close();
     }
 ?>
