@@ -8,6 +8,7 @@
     <meta name='viewpoint' content='width=device-width, initial-scale=1.0'>
     <title>課表查詢系統</title>
     <link rel='stylesheet' href='css/style.css'>
+    <script src='js/main.js' defer></script>
 </head>
 <body>
     <a href="index.php" class="back-button">← 返回首頁</a>
@@ -58,7 +59,7 @@
                             JOIN teacher tea ON s.teacher_id = tea.teacher_id
                             WHERE s.class_id = ? && tim.period = ?
                             ORDER BY tim.weekday");
-                            
+
                             for( $i = 1; $i <= 8; $i++ )
                             {
                                 echo "<tr>";
@@ -68,19 +69,22 @@
 
                                 $courses = array_pad($row, 5, null);
 
+                                $index = $i;
+                                
                                 foreach( $courses as $c ) 
                                 {
                                     if( $c !== NULL )
                                     {
-                                    echo "<td class='course-cell'>"; 
+                                    echo "<td class='course-cell' data-left-index='$index'>"; 
                                     echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
                                     echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
                                     echo "</td>";
                                     }
                                     else
                                     {
-                                        echo "<td class='course-cell empty-cell'></td>";
+                                        echo "<td class='course-cell empty-cell' data-left-index='$index'></td>";
                                     }
+                                    $index += 8;
                                 }
                                 echo "</tr>";
                             }
@@ -90,7 +94,7 @@
             </div>
 
             <div class='table-container'>
-                <h2 class="table-title">調整後課表</h2>
+                <h2 id='table-title-2' class="table-title">調整後課表</h2>
                 <table class='schedule-table'>
                     <thead>
                         <tr>
@@ -114,6 +118,8 @@
                             WHERE s.class_id = ? && tim.period = ?
                             ORDER BY tim.weekday");
                             
+                            $index = 1;
+
                             for( $i = 1; $i <= 8; $i++ )
                             {
                                 echo "<tr>";
@@ -123,22 +129,37 @@
 
                                 $courses = array_pad($row, 5, null);
 
+                                $index = $i;
+
                                 foreach( $courses as $c ) 
                                 {
-                                    if( $c !== NULL )
+                                    if( false )//if( $c !== NULL )
                                     {
-                                    echo "<td class='course-cell'>"; 
+                                    echo "<td class='course-cell' data-right-index='$index'>"; 
                                     echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
                                     echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
                                     echo "</td>";
                                     }
                                     else
                                     {
-                                        echo "<td class='course-cell empty-cell'></td>";
+                                        echo "<td class='course-cell empty-cell' data-right-index='$index'></td>";
                                     }
+                                    $index += 8;
                                 }
                                 echo "</tr>";
                             }
+                            // $stmt = $pdo->prepare("SELECT 
+                            //     sub.subject_name,
+                            //     tea.teacher_name
+                            // FROM schedule s
+                            // JOIN timeslot tim ON s.timeslot_id = tim.timeslot_id
+                            // JOIN subject sub ON s.subject_id = sub.subject_id
+                            // JOIN teacher tea ON s.teacher_id = tea.teacher_id
+                            
+                            // ORDER BY tim.weekday");
+
+                            // $stmt->execute();
+                            // var_dump($stmt->fetchAll());
                         ?>
                     </tbody>
                 </table>
@@ -149,5 +170,8 @@
             <p>© 2025 課表查詢系統</p>
         </footer>
     </div>
+    <!-- <script>
+        document.getElementById('table-title-2').innerHTML = "教師課表2";
+    </script> -->
 </body>
 </html>

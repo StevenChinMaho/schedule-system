@@ -1,0 +1,1 @@
+document.getElementById('table-title-2').innerHTML = "教師課表";
