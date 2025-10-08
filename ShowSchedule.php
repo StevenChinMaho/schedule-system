@@ -122,7 +122,7 @@
             </div>
 
             <div class='table-container'>
-                <h2 id='table-title-2' class="table-title">調整後課表</h2>
+                <h2 id='table-title-2' class="table-title">選取左側課堂來顯示課表</h2>
                 <table class='schedule-table'>
                     <thead>
                         <tr>
@@ -157,5 +157,8 @@
             <p>© 2025 課表查詢系統</p>
         </footer>
     </div>
+    <script>
+        const teacherData = <?php echo json_encode( $raw_schedule, JSON_UNESCAPED_UNICODE ); ?>
+    </script>
 </body>
 </html>
