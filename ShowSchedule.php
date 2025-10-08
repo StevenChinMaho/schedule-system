@@ -1,5 +1,51 @@
 <?php
     require_once('includes/config.php');
+
+    $class_id = (int)$_GET['class_id'] > 0 && (int)$_GET['class_id'] <= 12 ? $_GET['class_id'] : '1';
+
+    $stmt = $pdo->prepare("SELECT 
+        tea.teacher_id, 
+        tea.teacher_name,
+        t.timeslot_id,
+        t.weekday,
+        t.period,
+        sub.subject_name,
+        c.class_id,
+        c.class_code
+    FROM schedule s2
+    JOIN teacher tea ON s2.teacher_id = tea.teacher_id
+    JOIN timeslot t ON s2.timeslot_id = t.timeslot_id
+    JOIN `subject` sub ON s2.subject_id = sub.subject_id 
+    JOIN class c ON s2.class_id = c.class_id
+    WHERE s2.teacher_id IN (
+        SELECT DISTINCT s.teacher_id
+        FROM schedule s
+        WHERE s.class_id = ?
+    )");
+    $stmt->execute([$class_id]);
+    $raw_schedule = $stmt->fetchAll();
+
+    $class_schedule = [];
+
+    foreach( $raw_schedule as $course )
+    {
+        if( $course['class_id'] == $class_id )
+        {
+            if( !isset($class_schedule[$course['period']][$course['weekday']]) )
+            {
+                $class_schedule[$course['period']][$course['weekday']] = [
+                    "timeslot_id" => $course["timeslot_id"],
+                    "subject_name" => $course["subject_name"],
+                    "teacher_name" => $course["teacher_name"],
+                    "teacher_id" => $course["teacher_id"]
+                ];
+            }
+            else
+            {
+                echo '<script> alert("警告：課表重複"); </script>';
+            }
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -15,8 +61,6 @@
 
     <div class='container'>
         <?php
-        $class_id = $_GET['class_id'];
-
         $stmt = $pdo->prepare("SELECT class_name FROM class WHERE class_id = ?");
         $stmt->execute([$class_id]);
         $class_name = $stmt->fetchColumn();
@@ -50,41 +94,25 @@
                     </thead>
                     <tbody>
                         <?php
-                            $stmt = $pdo->prepare("SELECT 
-                                sub.subject_name,
-                                tea.teacher_name
-                            FROM schedule s
-                            JOIN timeslot tim ON s.timeslot_id = tim.timeslot_id
-                            JOIN subject sub ON s.subject_id = sub.subject_id
-                            JOIN teacher tea ON s.teacher_id = tea.teacher_id
-                            WHERE s.class_id = ? && tim.period = ?
-                            ORDER BY tim.weekday");
-
-                            for( $i = 1; $i <= 8; $i++ )
+                            for( $p = 1; $p <= 8; $p++ )
                             {
                                 echo "<tr>";
-                                echo "<td class='period-cell'>$i</td>";
-                                $stmt->execute([$class_id, $i]);
-                                $row = $stmt->fetchAll();
-
-                                $courses = array_pad($row, 5, null);
-
-                                $index = $i;
+                                echo "<td class='period-cell'>$p</td>";
                                 
-                                foreach( $courses as $c ) 
+                                for( $w = 1; $w <= 5; $w++ ) 
                                 {
-                                    if( $c !== NULL )
+                                    if( isset($class_schedule[$p][$w]) )
                                     {
-                                    echo "<td class='course-cell' data-left-index='$index'>"; 
-                                    echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
-                                    echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
-                                    echo "</td>";
+                                        $c = &$class_schedule[$p][$w];
+                                        echo "<td class='course-cell' data-left-index='" . ($w - 1) * 8 + $p . "' data-tid='". htmlspecialchars( $c['teacher_id'] ) ."'>"; 
+                                        echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
+                                        echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
+                                        echo "</td>";
                                     }
                                     else
                                     {
-                                        echo "<td class='course-cell empty-cell' data-left-index='$index'></td>";
+                                        echo "<td class='course-cell empty-cell' data-left-index='" . ($w - 1) * 8 + $p . "'></td>";
                                     }
-                                    $index += 8;
                                 }
                                 echo "</tr>";
                             }
@@ -108,58 +136,17 @@
                     </thead>
                     <tbody>
                         <?php
-                            $stmt = $pdo->prepare("SELECT 
-                                sub.subject_name,
-                                tea.teacher_name
-                            FROM schedule s
-                            JOIN timeslot tim ON s.timeslot_id = tim.timeslot_id
-                            JOIN subject sub ON s.subject_id = sub.subject_id
-                            JOIN teacher tea ON s.teacher_id = tea.teacher_id
-                            WHERE s.class_id = ? && tim.period = ?
-                            ORDER BY tim.weekday");
-                            
-                            $index = 1;
-
-                            for( $i = 1; $i <= 8; $i++ )
+                            for( $p = 1; $p <= 8; $p++ )
                             {
                                 echo "<tr>";
-                                echo "<td class='period-cell'>$i</td>";
-                                $stmt->execute([$class_id, $i]);
-                                $row = $stmt->fetchAll();
+                                echo "<td class='period-cell'>$p</td>";
 
-                                $courses = array_pad($row, 5, null);
-
-                                $index = $i;
-
-                                foreach( $courses as $c ) 
+                                for( $w = 1; $w <= 5; $w++ ) 
                                 {
-                                    if( false )//if( $c !== NULL )
-                                    {
-                                    echo "<td class='course-cell' data-right-index='$index'>"; 
-                                    echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
-                                    echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
-                                    echo "</td>";
-                                    }
-                                    else
-                                    {
-                                        echo "<td class='course-cell empty-cell' data-right-index='$index'></td>";
-                                    }
-                                    $index += 8;
+                                    echo "<td class='course-cell empty-cell' data-right-index='" . ($w - 1) * 8 + $p . "'></td>";
                                 }
                                 echo "</tr>";
                             }
-                            // $stmt = $pdo->prepare("SELECT 
-                            //     sub.subject_name,
-                            //     tea.teacher_name
-                            // FROM schedule s
-                            // JOIN timeslot tim ON s.timeslot_id = tim.timeslot_id
-                            // JOIN subject sub ON s.subject_id = sub.subject_id
-                            // JOIN teacher tea ON s.teacher_id = tea.teacher_id
-                            
-                            // ORDER BY tim.weekday");
-
-                            // $stmt->execute();
-                            // var_dump($stmt->fetchAll());
                         ?>
                     </tbody>
                 </table>
@@ -170,8 +157,5 @@
             <p>© 2025 課表查詢系統</p>
         </footer>
     </div>
-    <!-- <script>
-        document.getElementById('table-title-2').innerHTML = "教師課表2";
-    </script> -->
 </body>
 </html>
