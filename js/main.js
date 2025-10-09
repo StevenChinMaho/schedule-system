@@ -1,14 +1,25 @@
-document.getElementById('table-title-2').innerHTML = "教師課表";
+let selected = null;
 
-console.log(teacherData);
+function clickToSelect () 
+{
+    if( selected === null ) 
+    {
+        selected = this;
 
-const arr = [1, 2, 3, 4, 5];
+        selected.classList.add('selected');
+    } 
+    else 
+    {
+        if( selected === this )
+        {
+            selected.classList.remove('selected');
 
-console.log(arr);
+            selected = null;
+        }
+    }
 
-setTimeout( () => {
-arr[0] = 6;
-console.log(arr);
-}, 5000)
+}
 
-
+document.querySelectorAll('.course-cell').forEach(cell => {
+  cell.addEventListener('click', clickToSelect );
+});
