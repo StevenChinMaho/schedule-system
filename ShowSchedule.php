@@ -158,7 +158,7 @@
         </footer>
     </div>
     <script>
-        const teacherData = <?php echo json_encode( $raw_schedule, JSON_UNESCAPED_UNICODE ); ?>
+        const rawSchedule = <?php echo json_encode( $raw_schedule, JSON_UNESCAPED_UNICODE ); ?>
     </script>
 </body>
 </html>

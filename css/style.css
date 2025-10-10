@@ -177,8 +177,8 @@ body {
 
 .course-cell.selected {
     background: #bbdefb;
-    border: 2px solid #2196F3;
-    box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+    /* border: 1px solid #2196F3; */
+    box-shadow: 0 10px rgba(33, 150, 243, 0.3);
 }
 
 .course-cell.available {
