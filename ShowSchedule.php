@@ -104,7 +104,7 @@
                                     if( isset($class_schedule[$p][$w]) )
                                     {
                                         $c = &$class_schedule[$p][$w];
-                                        echo "<td class='course-cell' data-left-index='" . ($w - 1) * 8 + $p . "' data-tid='". htmlspecialchars( $c['teacher_id'] ) ."'>"; 
+                                        echo "<td class='course-cell class-cell' data-left-index='" . ($w - 1) * 8 + $p . "' data-tid='". htmlspecialchars( $c['teacher_id'] ) ."'>"; 
                                         echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
                                         echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
                                         echo "</td>";
@@ -143,7 +143,7 @@
 
                                 for( $w = 1; $w <= 5; $w++ ) 
                                 {
-                                    echo "<td class='course-cell empty-cell' data-right-index='" . ($w - 1) * 8 + $p . "'></td>";
+                                    echo "<td class='course-cell teacher-cell empty-cell' data-right-index='" . ($w - 1) * 8 + $p . "'></td>";
                                 }
                                 echo "</tr>";
                             }

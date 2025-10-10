@@ -6,7 +6,7 @@ const teachersSchedule = rawSchedule.reduce( ( acc, course ) => {
     return acc;
 }, {});
 
-function clickToSelect () 
+function clickCell () 
 {
     if( selected === null ) 
     {
@@ -23,9 +23,28 @@ function clickToSelect ()
             selected = null;
         }
     }
-
 }
 
-document.querySelectorAll('.course-cell').forEach(cell => {
-  cell.addEventListener('click', clickToSelect );
+function displayTeacherSchedule () 
+{
+    let tid = this.dataset.tid;
+    console.log(tid);
+    let index = this.dataset.leftIndex;
+    console.log(index);
+
+    document.querySelectorAll("[data-right-index='" + index + "']")[0].innerHTML = tid;
+}
+
+function clearTeacherSchedule () 
+{
+    document.querySelectorAll('.teacher-cell').forEach( cell => {
+        cell.innerHTML = "";
+    });
+}
+
+document.querySelectorAll('.class-cell').forEach(cell => 
+{
+    cell.addEventListener('click', clickCell );
+    cell.addEventListener('mouseenter', displayTeacherSchedule );
+    cell.addEventListener('mouseleave', clearTeacherSchedule );
 });
