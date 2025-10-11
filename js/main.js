@@ -23,6 +23,27 @@ function checkExchange()
             cell.classList.add( "unavailable" );
         }
     });
+
+    document.querySelectorAll(".class-cell").forEach( cell => 
+    {
+        if( !cell.classList.contains( "selected" ) && !cell.classList.contains( "unavailable" ) )
+        {
+            let exchangeTid = cell.dataset.tid;
+
+            console.log(teachersSchedule[exchangeTid]);
+
+            if( teachersSchedule[exchangeTid].some( course => course["timeslot_id"] == selected.dataset.leftIndex ) )
+            {
+                cell.classList.add( "unavailable" );
+                console.log( "NO" );
+            }
+            // else
+            // {
+            //     cell.classList.add( "available" );
+            // }
+        }
+        else console.log(cell);
+    });
 }
 
 function resetExchange()
@@ -31,7 +52,7 @@ function resetExchange()
 
     document.querySelectorAll( ".class-cell" ).forEach( cell => 
     {
-        cell.classList.remove( "unavailable" );
+        cell.classList.remove( "unavailable", "available" );
     });
 }
 
@@ -60,7 +81,7 @@ function displayTeacherSchedule()
 {
     let tid = this.dataset.tid;
     
-    console.log(teachersSchedule[tid]);
+    // console.log(teachersSchedule[tid]);
 
     document.getElementById("teacher-title").textContent = teachersSchedule[tid][0]['teacher_name'] + " 老師的課表";
     
