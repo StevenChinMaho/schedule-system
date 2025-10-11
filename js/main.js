@@ -12,8 +12,6 @@ function checkExchange()
 
     teachersSchedule[tid].forEach( course => 
     {
-        console.log(course["timeslot_id"]);
-
         let timeslot_id = course["timeslot_id"];
 
         let cell = document.querySelector("[data-left-index='" + timeslot_id + "']");
@@ -30,19 +28,15 @@ function checkExchange()
         {
             let exchangeTid = cell.dataset.tid;
 
-            console.log(teachersSchedule[exchangeTid]);
-
             if( teachersSchedule[exchangeTid].some( course => course["timeslot_id"] == selected.dataset.leftIndex ) )
             {
                 cell.classList.add( "unavailable" );
-                console.log( "NO" );
             }
             // else
             // {
             //     cell.classList.add( "available" );
             // }
         }
-        else console.log(cell);
     });
 }
 
@@ -80,8 +74,6 @@ function clickCell()
 function displayTeacherSchedule() 
 {
     let tid = this.dataset.tid;
-    
-    // console.log(teachersSchedule[tid]);
 
     document.getElementById("teacher-title").textContent = teachersSchedule[tid][0]['teacher_name'] + " 老師的課表";
     
