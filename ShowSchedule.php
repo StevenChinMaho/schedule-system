@@ -154,7 +154,7 @@
         </div>
 
         <footer class='page-footer'>
-            <p>© 2025 課表查詢系統</p>
+            <p>© 2025 Steven Chin | 教師調課系統 | Licensed under MIT License</p>
         </footer>
     </div>
     <script>

@@ -28,9 +28,7 @@ function clickCell ()
 function displayTeacherSchedule () 
 {
     let tid = this.dataset.tid;
-    console.log(tid);
     let index = this.dataset.leftIndex;
-    console.log(index);
 
     document.querySelectorAll("[data-right-index='" + index + "']")[0].innerHTML = tid;
 }
