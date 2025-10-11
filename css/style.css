@@ -166,12 +166,13 @@ body {
     z-index: 10;
 }
 
-.unavailable {
+.unavailable, .excluded {
     background: #c6c6c6;
     cursor: not-allowed;
 }
 
-.course-cell.unavailable:hover {
+.course-cell.unavailable:hover,
+.course-cell.excluded:hover {
     background: #c6c6c6;
 }
 

@@ -122,7 +122,7 @@
             </div>
 
             <div class='table-container'>
-                <h2 id='table-title-2' class="table-title">選取左側課堂來顯示課表</h2>
+                <h2 id='teacher-title' class="table-title">選取左側課堂來顯示課表</h2>
                 <table class='schedule-table'>
                     <thead>
                         <tr>

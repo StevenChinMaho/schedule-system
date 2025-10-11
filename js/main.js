@@ -1,18 +1,49 @@
-let selected = null;
-
 const teachersSchedule = rawSchedule.reduce( ( acc, course ) => {
     const key = course['teacher_id'];
     ( acc[key] ||= [] ).push(course);
     return acc;
 }, {});
 
-function clickCell () 
+let selected = null;
+
+function checkExchange() 
+{
+    let tid = selected.dataset.tid;
+
+    teachersSchedule[tid].forEach( course => 
+    {
+        console.log(course["timeslot_id"]);
+
+        let timeslot_id = course["timeslot_id"];
+
+        let cell = document.querySelector("[data-left-index='" + timeslot_id + "']");
+
+        if( !cell.classList.contains( "selected" ) )
+        {
+            cell.classList.add( "unavailable" );
+        }
+    });
+}
+
+function resetExchange()
+{
+    selected = null;
+
+    document.querySelectorAll( ".class-cell" ).forEach( cell => 
+    {
+        cell.classList.remove( "unavailable" );
+    });
+}
+
+function clickCell() 
 {
     if( selected === null ) 
     {
         selected = this;
 
         selected.classList.add('selected');
+
+        checkExchange();
     } 
     else 
     {
@@ -20,22 +51,34 @@ function clickCell ()
         {
             selected.classList.remove('selected');
 
-            selected = null;
+            resetExchange();
         }
     }
 }
 
-function displayTeacherSchedule () 
+function displayTeacherSchedule() 
 {
     let tid = this.dataset.tid;
-    let index = this.dataset.leftIndex;
+    
+    console.log(teachersSchedule[tid]);
 
-    document.querySelectorAll("[data-right-index='" + index + "']")[0].innerHTML = tid;
+    document.getElementById("teacher-title").textContent = teachersSchedule[tid][0]['teacher_name'] + " 老師的課表";
+    
+    teachersSchedule[tid].forEach( course => {
+        let HTML = "<div class='subject-name'>" + course['subject_name'] + "</div>" +
+                    "<div class='teacher-name'>" + course['class_code'] + "</div>";
+
+        document.querySelector("[data-right-index='" + course['timeslot_id'] + "']").innerHTML = HTML;
+    });
+
 }
 
-function clearTeacherSchedule () 
+function clearTeacherSchedule() 
 {
-    document.querySelectorAll('.teacher-cell').forEach( cell => {
+    document.getElementById("teacher-title").textContent = "選取左側課堂來顯示課表";
+
+    document.querySelectorAll('.teacher-cell').forEach( cell => 
+    {
         cell.innerHTML = "";
     });
 }
