@@ -73,9 +73,21 @@
         </header>
 
         <div class="control-panel">
-            <!-- 預留給按鈕和輸入框的空間 -->
             <div class="control-content">
-                <!-- 這裡之後可以放置按鈕、輸入框等操作元件 -->
+                <div class="control-item">
+                    <input type="checkbox" id="period" class="toggle-checkbox">
+                    <label for="period" class="toggle-text">排除第八節</label>
+                </div>
+
+                <div class="control-item">
+                    <input type="checkbox" id="classActive" class="toggle-checkbox">
+                    <label for="classActive" class="toggle-text">排除班級活動</label>
+                </div>
+
+                <div class="control-item">
+                    <input type="checkbox" id="special" class="toggle-checkbox">
+                    <label for="special" class="toggle-text">國數調課限制</label>
+                </div>
             </div>
         </div>
 

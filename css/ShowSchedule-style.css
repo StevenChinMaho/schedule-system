@@ -1,18 +1,39 @@
 /* 控制面板 */
 .control-panel {
-    background: #f8f9fa;
-    padding: 15px 30px;
-    border-bottom: 2px solid #e9ecef;
-    min-height: 60px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 20px 30px;
+    border-bottom: 2px solid #dee2e6;
+    min-height: 70px;
     display: flex;
     align-items: center;
 }
 
 .control-content {
     width: 100%;
-    display: flex;
-    gap: 15px;
+    display: flex;  
+    gap: 30px;
     align-items: center;
+    flex-wrap: wrap;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 10px;
+    padding: 10px 15px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1);
+    border: 2px solid #f0f0f0;
+    transition: all 0.3s ease;  
+}
+
+.toggle-text {
+    display: flex;
+    align-items: center;
+    margin: 0px 0px 0px 7px;
+    font-size: 1em;
+    font-weight: 500;
+    color: #2c3e50;
 }
 
 /* 課表容器 */
@@ -116,10 +137,6 @@
 .course-cell.available {
     background: #9bff6cc9;
 }
-/* 
-.empty-cell {
-    background: #f9f9f9;
-} */
 
 .empty-cell:hover {
     background: #f0f0f0;
