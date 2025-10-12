@@ -118,13 +118,15 @@
     z-index: 10;
 }
 
-.unavailable, .excluded {
+.unavailable, .excludePeriod, .excludeClassActive, .excludeSpecial {
     background: #c6c6c6;
     cursor: not-allowed;
 }
 
 .course-cell.unavailable:hover,
-.course-cell.excluded:hover {
+.course-cell.excludePeriod:hover,
+.course-cell.excludeClassActive:hover,
+.course-cell.excludeSpecial:hover {
     background: #c6c6c6;
 }
 

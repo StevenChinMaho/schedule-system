@@ -4,17 +4,25 @@ const teachersSchedule = rawSchedule.reduce( ( acc, course ) => {
     return acc;
 }, {});
 
+const classCells = document.querySelectorAll(".class-cell");
+const teacherCells = document.querySelectorAll(".teacher-cell");
+const teacherSchedleTitle = document.getElementById("teacherTitle");
+const periodChk = document.getElementById("periodChk");
+const classActiveChk = document.getElementById("classActiveChk");
+const specialChk = document.getElementById("specialChk");
 let selected = null;
-let classCells = document.querySelectorAll(".class-cell");
-let teacherCells = document.querySelectorAll(".teacher-cell");
-let teacherSchedleTitle = document.getElementById("teacherTitle");
-let periodChk = document.getElementById("periodChk");
-let classActiveChk = document.getElementById("classActiveChk");
-let specialChk = document.getElementById("specialChk");
 
 function checkExchange() 
 {
-    let tid = selected.dataset.tid;
+    const tid = selected.dataset.tid;
+    const selectedName = selected.querySelector(".subject-name").innerHTML;
+
+    if ( specialChk.checked && (selectedName === "國文" || selectedName === "數學") ) {
+        classCells.forEach( cell => {
+            const SN = cell.querySelector(".subject-name").innerHTML;
+            if ( SN !== "國文" && SN !== "數學") cell.classList.add("excludeSpecial");
+        });
+    }
 
     teachersSchedule[tid].forEach( course => 
     {
@@ -44,13 +52,13 @@ function checkExchange()
 
 function resetExchange()
 {
-    selected.classList.remove("selected");
+    if ( selected ) selected.classList.remove("selected");
 
     selected = null;
 
     classCells.forEach( cell => 
     {
-        cell.classList.remove( "unavailable", "available" );
+        cell.classList.remove( "unavailable", "available", "excludeSpecial" );
     });
 }
 
@@ -58,7 +66,7 @@ function clickCell()
 {
     if( this.classList.contains("empty-cell") ) return 0;
 
-    if( selected === null ) 
+    if( selected === null && !this.classList.contains("excludePeriod") && !this.classList.contains("excludeClassActive") ) 
     {
         selected = this;
 
@@ -92,14 +100,6 @@ function displayTeacherSchedule()
 
 }
 
-document.querySelector("#periodChk").addEventListener( "change", () => {
-    console.log("changed!");
-});
-
-document.querySelector("#classActiveChk").addEventListener( "change", () => {
-    console.log("active!")
-})
-
 function clearTeacherSchedule() 
 {
     teacherSchedleTitle.textContent = "選取左側課堂來顯示課表";
@@ -109,6 +109,38 @@ function clearTeacherSchedule()
         cell.innerHTML = "";
     });
 }
+
+periodChk.addEventListener( "change", function () {
+    if (periodChk.checked) {
+        classCells.forEach( cell => {
+            if (cell.dataset.leftIndex % 8 === 0) {
+                if (cell.classList.contains("selected")) resetExchange();
+                cell.classList.add("excludePeriod");
+            }
+        })
+    } else {
+        classCells.forEach( cell => {
+            if (cell.dataset.leftIndex % 8 === 0) cell.classList.remove("excludePeriod");
+        })
+    }
+});
+
+classActiveChk.addEventListener( "change", function () {
+    if (classActiveChk.checked) {
+        classCells.forEach( cell => {
+            if (cell.dataset.leftIndex == 14 || cell.dataset.leftIndex == 15) {
+                if (cell.classList.contains("selected")) resetExchange();
+                cell.classList.add("excludeClassActive");
+            }
+        })
+    } else {
+        classCells.forEach( cell => {
+            if (cell.dataset.leftIndex == 14 || cell.dataset.leftIndex == 15) cell.classList.remove("excludeClassActive");
+        })
+    }
+});
+
+specialChk.addEventListener("change", resetExchange);
 
 classCells.forEach(cell => 
 {
