@@ -75,18 +75,18 @@
         <div class="control-panel">
             <div class="control-content">
                 <div class="control-item">
-                    <input type="checkbox" id="period" class="toggle-checkbox">
-                    <label for="period" class="toggle-text">排除第八節</label>
+                    <input type="checkbox" id="periodChk" class="toggle-checkbox">
+                    <label for="periodChk" class="toggle-text">排除第八節</label>
                 </div>
 
                 <div class="control-item">
-                    <input type="checkbox" id="classActive" class="toggle-checkbox">
-                    <label for="classActive" class="toggle-text">排除班級活動</label>
+                    <input type="checkbox" id="classActiveChk" class="toggle-checkbox">
+                    <label for="classActiveChk" class="toggle-text">排除社團課與班級活動</label>
                 </div>
 
                 <div class="control-item">
-                    <input type="checkbox" id="special" class="toggle-checkbox">
-                    <label for="special" class="toggle-text">國數調課限制</label>
+                    <input type="checkbox" id="specialChk" class="toggle-checkbox">
+                    <label for="specialChk" class="toggle-text">國數調課限制</label>
                 </div>
             </div>
         </div>
@@ -135,7 +135,7 @@
             </div>
 
             <div class='table-container'>
-                <h2 id='teacher-title' class="table-title">選取左側課堂來顯示課表</h2>
+                <h2 id='teacherTitle' class="table-title">選取左側課堂來顯示課表</h2>
                 <table class='schedule-table'>
                     <thead>
                         <tr>
