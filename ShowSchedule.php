@@ -53,7 +53,8 @@
     <meta charset="UTF-8">
     <meta name='viewpoint' content='width=device-width, initial-scale=1.0'>
     <title>課表查詢系統</title>
-    <link rel='stylesheet' href='css/style.css'>
+    <link rel='stylesheet' href="css/frame.css">
+    <link rel='stylesheet' href='css/ShowSchedule-style.css'>
     <script src='js/main.js' defer></script>
 </head>
 <body>

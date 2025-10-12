@@ -1,16 +1,9 @@
 /* 首頁專用樣式 */
-
 .subtitle {
     font-size: 1.1em;   
     margin-top: 10px;
     opacity: 0.95;
     font-weight: 400;
-}
-
-.main-content {
-    padding: 60px 30px;
-    max-width: 900px;
-    margin: 0 auto;
 }
 
 /* 選擇卡片 */
