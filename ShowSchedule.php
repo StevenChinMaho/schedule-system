@@ -57,7 +57,7 @@
     <script src='js/main.js' defer></script>
 </head>
 <body>
-    <a href="index.php" class="back-button">← 返回首頁</a>
+    <a href="index.html" class="back-button">← 返回首頁</a>
 
     <div class='container'>
         <?php
