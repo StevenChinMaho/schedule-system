@@ -24,7 +24,7 @@ function checkExchange()
 
     document.querySelectorAll(".class-cell").forEach( cell => 
     {
-        if( !cell.classList.contains( "selected" ) && !cell.classList.contains( "unavailable" ) )
+        if( !cell.classList.contains( "empty-cell" )&& !cell.classList.contains( "selected" ) && !cell.classList.contains( "unavailable" ) )
         {
             let exchangeTid = cell.dataset.tid;
 
@@ -42,6 +42,8 @@ function checkExchange()
 
 function resetExchange()
 {
+    selected.classList.remove('selected');
+
     selected = null;
 
     document.querySelectorAll( ".class-cell" ).forEach( cell => 
@@ -52,6 +54,8 @@ function resetExchange()
 
 function clickCell() 
 {
+    if( this.classList.contains("empty-cell") ) return 0;
+
     if( selected === null ) 
     {
         selected = this;
@@ -64,8 +68,6 @@ function clickCell()
     {
         if( selected === this )
         {
-            selected.classList.remove('selected');
-
             resetExchange();
         }
     }
@@ -73,6 +75,8 @@ function clickCell()
 
 function displayTeacherSchedule() 
 {
+    if ( this.classList.contains("empty-cell") ) return 0;
+
     let tid = this.dataset.tid;
 
     document.getElementById("teacher-title").textContent = teachersSchedule[tid][0]['teacher_name'] + " 老師的課表";

@@ -124,7 +124,7 @@
                                     }
                                     else
                                     {
-                                        echo "<td class='course-cell empty-cell' data-left-index='" . ($w - 1) * 8 + $p . "'></td>";
+                                        echo "<td class='course-cell class-cell empty-cell' data-left-index='" . ($w - 1) * 8 + $p . "'></td>";
                                     }
                                 }
                                 echo "</tr>";
