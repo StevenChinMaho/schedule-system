@@ -46,13 +46,19 @@
             }
         }
     }
+
+    $stmt = $pdo->prepare("SELECT class_name, class_code FROM class WHERE class_id = ?");
+    $stmt->execute([$class_id]);
+    $result = $stmt->fetchAll();
+    $class_name = $result[0]["class_name"];
+    $class_code = $result[0]["class_code"];
 ?>
 <!DOCTYPE html>
 <html>
 <head lang='zh-TW'>
     <meta charset="UTF-8">
     <meta name='viewpoint' content='width=device-width, initial-scale=1.0'>
-    <title>課表查詢系統</title>
+    <title>課表查詢系統 - <?php echo htmlspecialchars($class_code)?></title>
     <link rel='stylesheet' href="css/frame.css">
     <link rel='stylesheet' href='css/ShowSchedule-style.css'>
     <script src='js/main.js' defer></script>
@@ -61,12 +67,6 @@
     <a href="index.html" class="back-button">← 返回首頁</a>
 
     <div class='container'>
-        <?php
-        $stmt = $pdo->prepare("SELECT class_name FROM class WHERE class_id = ?");
-        $stmt->execute([$class_id]);
-        $class_name = $stmt->fetchColumn();
-        ?>
-
         <header class='page-header'>
             <h1><?php echo htmlspecialchars($class_name); ?> 的課表</h1>
             <div class='header-decoration'></div>
@@ -167,7 +167,7 @@
         </div>
 
         <footer class='page-footer'>
-            <p>© 2025 Steven Chin | 教師調課系統 | Licensed under MIT License</p>
+            <p>© 2025 Steven Chin | 調課查詢系統 | Licensed under MIT License</p>
         </footer>
     </div>
     <script>

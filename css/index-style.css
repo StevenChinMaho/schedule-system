@@ -129,6 +129,8 @@
     background: white;
     padding: 30px 25px;
     border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.3s ease;
