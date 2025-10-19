@@ -12,6 +12,11 @@
 -- 重要約束：
 -- - 每個時段一個班級只能有一門課
 -- - 每個時段一位教師只能教一門課
+-- 
+-- 索引設計：
+-- - uk_class_timeslot: 防止同班同時段重複排課
+-- - uk_teacher_timeslot: 防止同師同時段重複排課
+-- - idx_class_lookup: 查詢班級相關教師用（ShowSchedule.php）
 -- ============================================
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -88,29 +93,42 @@ CREATE TABLE `schedule` (
 -- 索引與主鍵
 --
 
+--
+-- 資料表索引 `class`
+--
 ALTER TABLE `class`
   ADD PRIMARY KEY (`class_id`),
-  ADD UNIQUE KEY `class_code` (`class_code`);
+  ADD UNIQUE KEY `uk_class_code` (`class_code`);
 
+--
+-- 資料表索引 `teacher`
+--
 ALTER TABLE `teacher`
   ADD PRIMARY KEY (`teacher_id`);
 
+--
+-- 資料表索引 `subject`
+--
 ALTER TABLE `subject`
   ADD PRIMARY KEY (`subject_id`);
 
+--
+-- 資料表索引 `timeslot`
+--
 ALTER TABLE `timeslot`
   ADD PRIMARY KEY (`timeslot_id`),
-  ADD UNIQUE KEY `weekday_period` (`weekday`, `period`);
+  ADD UNIQUE KEY `uk_weekday_period` (`weekday`, `period`);
 
+--
+-- 資料表索引 `schedule`
+--
 ALTER TABLE `schedule`
   ADD PRIMARY KEY (`schedule_id`),
-  ADD UNIQUE KEY `timeslot_class` (`timeslot_id`, `class_id`) COMMENT '確保同一時段班級不重複',
-  ADD UNIQUE KEY `timeslot_teacher` (`timeslot_id`, `teacher_id`) COMMENT '確保同一時段教師不重複',
-  ADD KEY `class_id` (`class_id`),
-  ADD KEY `subject_id` (`subject_id`),
-  ADD KEY `teacher_id` (`teacher_id`),
+  ADD UNIQUE KEY `uk_class_timeslot` (`class_id`, `timeslot_id`) COMMENT '確保同一班級時段不重複',
+  ADD UNIQUE KEY `uk_teacher_timeslot` (`teacher_id`, `timeslot_id`) COMMENT '確保同一教師時段不重複',
   ADD KEY `idx_class_lookup` (`class_id`, `teacher_id`) COMMENT '查詢班級相關教師用',
-  ADD KEY `idx_teacher_lookup` (`teacher_id`, `timeslot_id`) COMMENT '查詢教師課表用';
+  ADD KEY `fk_schedule_subject` (`subject_id`),
+  ADD KEY `fk_schedule_timeslot` (`timeslot_id`);
 
 -- --------------------------------------------------------
 
@@ -140,10 +158,26 @@ ALTER TABLE `schedule`
 --
 
 ALTER TABLE `schedule`
-  ADD CONSTRAINT `fk_schedule_class` FOREIGN KEY (`class_id`) REFERENCES `class` (`class_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_schedule_subject` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`subject_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_schedule_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teacher` (`teacher_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_schedule_timeslot` FOREIGN KEY (`timeslot_id`) REFERENCES `timeslot` (`timeslot_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_schedule_class` 
+    FOREIGN KEY (`class_id`) 
+    REFERENCES `class` (`class_id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_schedule_subject` 
+    FOREIGN KEY (`subject_id`) 
+    REFERENCES `subject` (`subject_id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_schedule_teacher` 
+    FOREIGN KEY (`teacher_id`) 
+    REFERENCES `teacher` (`teacher_id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_schedule_timeslot` 
+    FOREIGN KEY (`timeslot_id`) 
+    REFERENCES `timeslot` (`timeslot_id`) 
+    ON DELETE CASCADE 
+    ON UPDATE CASCADE;
 
 COMMIT;
 
