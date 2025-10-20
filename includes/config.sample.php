@@ -4,6 +4,16 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'the_DB');
 
+$asset_versions = [
+    "feedback-style.css" => filemtime( "css/feedback-style.css" ),
+    "frame.css" => filemtime( "css/frame.css" ),
+    "index-style.css" => filemtime( "css/index-style.css" ),
+    "ShowSchedule-style.css" => filemtime( "css/ShowSchedule-style.css" ),
+    "feedback.js" => filemtime( "js/feedback.js" ),
+    "index.js" => filemtime( "js/index.js" ),
+    "main.js" => filemtime( "js/main.js" )
+];
+
 try {
     $pdo = new PDO( 
         "mysql:host=" . DB_HOST . "; dbname=" . DB_NAME . ";charset=utf8mb4", 

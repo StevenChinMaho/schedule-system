@@ -9,9 +9,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>湖內國中調課查詢系統 - 意見回饋</title>
-    <link rel="stylesheet" href="css/frame.css">
-    <link rel="stylesheet" href="css/feedback-style.css">
-    <script src="js/feedback.js"></script>
+    <link rel="stylesheet" href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
+    <link rel="stylesheet" href="css/feedback-style.css?v=<?php echo $asset_versions["feedback-style.css"];?>">
+    <script src="js/feedback.js?v=<?php echo $asset_versions["feedback.js"];?>"></script>
 </head>
 <body>
     <a href="index.html" class="back-button">← 返回首頁</a>

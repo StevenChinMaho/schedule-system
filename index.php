@@ -1,12 +1,15 @@
+<?php
+    require_once("includes/config.php");
+?>
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>湖內國中調課查詢系統 - 首頁</title>
-    <link rel="stylesheet" href="css/frame.css">
-    <link rel="stylesheet" href="css/index-style.css">
-    <script src="js/index.js" defer></script>
+    <link rel="stylesheet" href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
+    <link rel="stylesheet" href="css/index-style.css?v=<?php echo $asset_versions["index-style.css"];?>">
+    <script src="js/index.js?v=<?php echo $asset_versions["index.js"];?>" defer></script>
 </head>
 <body>
     <div class="container">
