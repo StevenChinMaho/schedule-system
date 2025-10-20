@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
 </head>
 <body>
-    <a href="index.html" class="back-button">← 返回首頁</a>
+    <a href="index.php" class="back-button">← 返回首頁</a>
 
     <div class="container">
         <header class="page-header">

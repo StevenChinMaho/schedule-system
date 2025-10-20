@@ -64,7 +64,7 @@
     <script src='js/main.js?v=<?php echo $asset_versions["main.js"];?>' defer></script>
 </head>
 <body>
-    <a href="index.html" class="back-button">← 返回首頁</a>
+    <a href="index.php" class="back-button">← 返回首頁</a>
 
     <div class='container'>
         <header class='page-header'>
