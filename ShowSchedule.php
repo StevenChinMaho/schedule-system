@@ -52,6 +52,26 @@
     $result = $stmt->fetchAll();
     $class_name = $result[0]["class_name"];
     $class_code = $result[0]["class_code"];
+
+    function log_access($class_id) 
+    {
+        $log_file = 'logs/access.log';
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $time = date('Y-m-d H:i:s');
+        $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+        
+        $log_entry = sprintf(
+            "[%s] IP: %s | Class: %s | UA: %s\n",
+            $time,
+            $ip,
+            $class_id,
+            $user_agent
+    );
+    
+    @file_put_contents($log_file, $log_entry, FILE_APPEND | LOCK_EX);
+    }
+
+    log_access($class_id);
 ?>
 <!DOCTYPE html>
 <html>
