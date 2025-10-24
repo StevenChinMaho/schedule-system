@@ -8,6 +8,7 @@
 -- - subject: 科目資料
 -- - timeslot: 時段資料（週一~五，每天8節，共40個時段）
 -- - schedule: 課表資料（連結班級、教師、科目、時段）
+-- - feedback: 意見回饋資料
 --
 -- 重要約束：
 -- - 每個時段一個班級只能有一門課
@@ -90,6 +91,21 @@ CREATE TABLE `schedule` (
 -- --------------------------------------------------------
 
 --
+-- 資料表結構 `feedback`
+--
+
+CREATE TABLE `feedback` (
+  `feedback_id` int(11) NOT NULL,
+  `feedback_type` enum('建議','錯誤回報','其他') NOT NULL DEFAULT '其他' COMMENT '回饋類型',
+  `feedback_content` text NOT NULL COMMENT '回饋內容',
+  `contact_info` varchar(100) DEFAULT NULL COMMENT '聯絡方式（選填）',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交時間',
+  `ip_address` varchar(45) DEFAULT NULL COMMENT 'IP位址',
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='意見回饋資料表';
+
+-- --------------------------------------------------------
+
+--
 -- 索引與主鍵
 --
 
@@ -130,6 +146,13 @@ ALTER TABLE `schedule`
   ADD KEY `fk_schedule_subject` (`subject_id`),
   ADD KEY `fk_schedule_timeslot` (`timeslot_id`);
 
+--
+-- 資料表索引 `feedback`
+--
+ALTER TABLE `feedback`
+  ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `idx_created_at` (`created_at`)
+
 -- --------------------------------------------------------
 
 --
@@ -150,6 +173,9 @@ ALTER TABLE `timeslot`
 
 ALTER TABLE `schedule`
   MODIFY `schedule_id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `feedback`
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT;
 
 -- --------------------------------------------------------
 
