@@ -50,7 +50,7 @@
                 </a>
                 <a href="feedback.php" id="feedback" class="info-card">
                     <div class="info-icon">📩</div>
-                    <h3>意見回饋（功能開發中）</h3>
+                    <h3>意見回饋</h3>
                     <p>系統功能建議或錯誤回報</p>
                 </a>
             </div>
