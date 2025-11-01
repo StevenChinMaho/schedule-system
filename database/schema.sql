@@ -100,7 +100,7 @@ CREATE TABLE `feedback` (
   `feedback_content` text NOT NULL COMMENT '回饋內容',
   `contact_info` varchar(100) DEFAULT NULL COMMENT '聯絡方式（選填）',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交時間',
-  `ip_address` varchar(45) DEFAULT NULL COMMENT 'IP位址',
+  `ip_address` varchar(45) DEFAULT NULL COMMENT 'IP位址'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='意見回饋資料表';
 
 -- --------------------------------------------------------
@@ -151,7 +151,7 @@ ALTER TABLE `schedule`
 --
 ALTER TABLE `feedback`
   ADD PRIMARY KEY (`feedback_id`),
-  ADD KEY `idx_created_at` (`created_at`)
+  ADD KEY `idx_created_at` (`created_at`);
 
 -- --------------------------------------------------------
 
