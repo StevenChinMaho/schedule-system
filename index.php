@@ -21,7 +21,7 @@
 
         <div class="main-content">
             <div class="selection-card">
-                <form method="get" action="ShowSchedule.php" id="classForm">
+                <form method="get" action="showSchedule.php" id="classForm">
                     <div class="form-group">
                         <label for="grade">選擇年級</label>
                         <select name="grade" id="grade" class="form-select" required>

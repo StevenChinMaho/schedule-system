@@ -17,7 +17,7 @@
 -- 索引設計：
 -- - uk_class_timeslot: 防止同班同時段重複排課
 -- - uk_teacher_timeslot: 防止同師同時段重複排課
--- - idx_class_lookup: 查詢班級相關教師用（ShowSchedule.php）
+-- - idx_class_lookup: 查詢班級相關教師用（showSchedule.php）
 -- ============================================
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
