@@ -80,7 +80,7 @@
     <meta name='viewpoint' content='width=device-width, initial-scale=1.0'>
     <title>課表查詢系統 - <?php echo htmlspecialchars($class_code)?></title>
     <link rel='stylesheet' href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
-    <link rel='stylesheet' href='css/ShowSchedule-style.css?v=<?php echo $asset_versions["ShowSchedule-style.css"];?>'>
+    <link rel='stylesheet' href='css/showSchedule-style.css?v=<?php echo $asset_versions["showSchedule-style.css"];?>'>
     <script src='js/main.js?v=<?php echo $asset_versions["main.js"];?>' defer></script>
 </head>
 <body>
