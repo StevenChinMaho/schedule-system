@@ -186,6 +186,10 @@
             </div>
         </div>
 
+        <div class="exchange-panel">
+
+        </div>
+
         <footer class='page-footer'>
             <p>© 2025 Steven Chin | 調課查詢系統 | Licensed under MIT License</p>
         </footer>

@@ -11,6 +11,7 @@ const periodChk = document.getElementById("periodChk");
 const classActiveChk = document.getElementById("classActiveChk");
 const specialChk = document.getElementById("specialChk");
 let selected = null;
+let exchange = null;
 
 function checkExchange() 
 {
@@ -53,12 +54,15 @@ function checkExchange()
 function resetExchange()
 {
     if ( selected ) selected.classList.remove("selected");
+    if ( exchange ) exchange.classList.remove("exchange");
 
     selected = null;
 
+    exchange = null;
+
     classCells.forEach( cell => 
     {
-        cell.classList.remove( "unavailable", "available", "excludeSpecial" );
+        cell.classList.remove( "unavailable", "excludeSpecial" );
     });
 }
 
@@ -79,6 +83,22 @@ function clickCell()
         if( selected === this )
         {
             resetExchange();
+        }
+        else if( !this.classList.contains("unavailable") && !this.classList.contains("excludePeriod") && !this.classList.contains("excludeClassActive") && !this.classList.contains("excludeSpecial") )
+        {
+            if( exchange === null )
+            {
+                exchange = this;
+
+                exchange.classList.add("exchange");
+            }
+            else{
+                exchange.classList.remove("exchange");
+
+                exchange = this;
+
+                exchange.classList.add("exchange");
+            }
         }
     }
 }
@@ -111,10 +131,11 @@ function clearTeacherSchedule()
 }
 
 periodChk.addEventListener( "change", function () {
+    resetExchange();
+
     if (periodChk.checked) {
         classCells.forEach( cell => {
             if (cell.dataset.leftIndex % 8 === 0) {
-                if (cell.classList.contains("selected")) resetExchange();
                 cell.classList.add("excludePeriod");
             }
         })
@@ -126,10 +147,11 @@ periodChk.addEventListener( "change", function () {
 });
 
 classActiveChk.addEventListener( "change", function () {
+    resetExchange();
+
     if (classActiveChk.checked) {
         classCells.forEach( cell => {
             if (cell.dataset.leftIndex == 14 || cell.dataset.leftIndex == 15) {
-                if (cell.classList.contains("selected")) resetExchange();
                 cell.classList.add("excludeClassActive");
             }
         })

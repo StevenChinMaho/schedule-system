@@ -136,8 +136,8 @@
     box-shadow: 0 10px rgba(33, 150, 243, 0.3);
 }
 
-.course-cell.available {
-    background: #9bff6cc9;
+.course-cell.exchange {
+    background: #81ed7dc9;
 }
 
 .empty-cell:hover {
