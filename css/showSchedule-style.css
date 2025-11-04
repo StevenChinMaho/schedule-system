@@ -130,13 +130,13 @@
     background: #c6c6c6;
 }
 
-.course-cell.selected {
+.course-cell.selectedA {
     background: #bbdefb;
     /* border: 1px solid #2196F3; */
     box-shadow: 0 10px rgba(33, 150, 243, 0.3);
 }
 
-.course-cell.exchange {
+.course-cell.selectedB {
     background: #81ed7dc9;
 }
 
@@ -167,6 +167,20 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+}
+
+.exchange-panel {
+    padding: 0px 30px 40px;
+}
+
+.exchange-panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px 12px 0 0;
+}
+
+.exchange-panel-body {
+    background: white;
+    border-radius: 0 0 12px 12px;
 }
 
 /* 響應式設計 */

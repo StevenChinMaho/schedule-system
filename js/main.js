@@ -10,15 +10,15 @@ const teacherSchedleTitle = document.getElementById("teacherTitle");
 const periodChk = document.getElementById("periodChk");
 const classActiveChk = document.getElementById("classActiveChk");
 const specialChk = document.getElementById("specialChk");
-let selected = null;
-let exchange = null;
+let selectedA = null;
+let selectedB = null;
 
 function checkExchange() 
 {
-    const tid = selected.dataset.tid;
-    const selectedName = selected.querySelector(".subject-name").innerHTML;
+    const tid = selectedA.dataset.tid;
+    const selectedAName = selectedA.querySelector(".subject-name").innerHTML;
 
-    if ( specialChk.checked && (selectedName === "國文" || selectedName === "數學") ) {
+    if ( specialChk.checked && (selectedAName === "國文" || selectedAName === "數學") ) {
         classCells.forEach( cell => {
             const SN = cell.querySelector(".subject-name").innerHTML;
             if ( SN !== "國文" && SN !== "數學") cell.classList.add("excludeSpecial");
@@ -31,7 +31,7 @@ function checkExchange()
 
         let cell = document.querySelector("[data-left-index='" + timeslot_id + "']");
 
-        if( !cell.classList.contains( "selected" ) )
+        if( !cell.classList.contains( "selectedA" ) )
         {
             cell.classList.add( "unavailable" );
         }
@@ -39,11 +39,11 @@ function checkExchange()
 
     classCells.forEach( cell => 
     {
-        if( !cell.classList.contains( "empty-cell" )&& !cell.classList.contains( "selected" ) && !cell.classList.contains( "unavailable" ) )
+        if( !cell.classList.contains( "empty-cell" )&& !cell.classList.contains( "selectedA" ) && !cell.classList.contains( "unavailable" ) )
         {
             let exchangeTid = cell.dataset.tid;
 
-            if( teachersSchedule[exchangeTid].some( course => course["timeslot_id"] == selected.dataset.leftIndex ) )
+            if( teachersSchedule[exchangeTid].some( course => course["timeslot_id"] == selectedA.dataset.leftIndex ) )
             {
                 cell.classList.add( "unavailable" );
             }
@@ -53,12 +53,12 @@ function checkExchange()
 
 function resetExchange()
 {
-    if ( selected ) selected.classList.remove("selected");
-    if ( exchange ) exchange.classList.remove("exchange");
+    if ( selectedA ) selectedA.classList.remove("selectedA");
+    if ( selectedB ) selectedB.classList.remove("selectedB");
 
-    selected = null;
+    selectedA = null;
 
-    exchange = null;
+    selectedB = null;
 
     classCells.forEach( cell => 
     {
@@ -70,34 +70,34 @@ function clickCell()
 {
     if( this.classList.contains("empty-cell") ) return 0;
 
-    if( selected === null && !this.classList.contains("excludePeriod") && !this.classList.contains("excludeClassActive") ) 
+    if( selectedA === null && !this.classList.contains("excludePeriod") && !this.classList.contains("excludeClassActive") ) 
     {
-        selected = this;
+        selectedA = this;
 
-        selected.classList.add("selected");
+        selectedA.classList.add("selectedA");
 
         checkExchange();
     } 
     else 
     {
-        if( selected === this )
+        if( selectedA === this )
         {
             resetExchange();
         }
         else if( !this.classList.contains("unavailable") && !this.classList.contains("excludePeriod") && !this.classList.contains("excludeClassActive") && !this.classList.contains("excludeSpecial") )
         {
-            if( exchange === null )
+            if( selectedB === null )
             {
-                exchange = this;
+                selectedB = this;
 
-                exchange.classList.add("exchange");
+                selectedB.classList.add("selectedB");
             }
             else{
-                exchange.classList.remove("exchange");
+                selectedB.classList.remove("selectedB");
 
-                exchange = this;
+                selectedB = this;
 
-                exchange.classList.add("exchange");
+                selectedB.classList.add("selectedB");
             }
         }
     }
