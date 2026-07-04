@@ -1,0 +1,20 @@
+# 設定預設行為：所有純文字檔案在 Git 儲存庫內一律以 LF 儲存
+* text=auto eol=lf
+
+# Explicitly declare file types (強制指定純文字檔案)
+*.php text eol=lf
+*.js  text eol=lf
+*.ts  text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md  text eol=lf
+*.sh  text eol=lf
+
+# 排除二進位檔案，避免 Git 誤改圖檔或壓縮檔編碼
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.pdf binary
