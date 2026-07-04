@@ -186,9 +186,62 @@
             </div>
         </div>
 
-        <div class="exchange-panel">
+            <div class="exchange-panel">
+                <div class="exchange-panel-header">
+                    <h2>調課單生成（功能開發中）</h2>
+                </div>
+                <div class="exchange-panel-body">
+                    <div class="course-card-wrapper">
+                        <div class="course-card-a-wrapper">
+                            <div class="course-card-a-header">
+                                <h3>原課程A</h3>
+                            </div>
+                            <div class="course-card-a-body">
+                                <p>科目</p>
+                                <p>教師</p>
+                                <p>節次</p>
+                                <div class="date-selector">
+                                    <p>課程 A 原始時間</p>
+                                    <label for="yearA">年：</label>
+                                    <select id="yearA"><option value="1970">1970</option></select>
+                                    <label for="monthA">月：</label>
+                                    <select id="monthA"><option value="1">1</option></select>
+                                    <label for="dayA">日：</label>
+                                    <select id="dayA"><option value="1">1</option></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="course-card-arrow">⇄</div>
+                        <div class="course-card-b-wrapper">
+                            <div class="course-card-b-header">
+                                <h3>原課程B</h3>
+                            </div>
+                            <div class="course-card-b-body">
+                                <p>科目</p>
+                                <p>教師</p>
+                                <p>節次</p>
+                                <div class="date-selector">
+                                    <p>課程 B 原始時間</p>
+                                    <label for="yearB">年：</label>
+                                    <select id="yearB"><option value="1970">1970</option></select>
+                                    <label for="monthB">月：</label>
+                                    <select id="monthB"><option value="1">1</option></select>
+                                    <label for="dayB">日：</label>
+                                    <select id="dayB"><option value="1">1</option></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="date-selector-group">
+                        
+                        
+                    </div>
 
-        </div>
+                    <!--<iframe src="https://docs.google.com/gview?url=https://kururinpa.ddnsking.com/schedule-system/ppp.pdf" width="100%" height="600px"></iframe>-->
+
+                </div>
+            </div>
 
         <footer class='page-footer'>
             <p>© 2025 Steven Chin | 調課查詢系統 | Licensed under MIT License</p>

@@ -82,7 +82,7 @@ try {
         <div class="error-container">
             <h1>⚠️ 系統暫時無法使用</h1>
             <p>很抱歉，資料庫連線發生問題。請稍後再試，或聯繫系統管理員。</p>
-            <a href="index.html" class="back-link">返回首頁</a>
+            <a href="index.php" class="back-link">返回首頁</a>
         </div>
     </body>
     </html>

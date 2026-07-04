@@ -132,12 +132,11 @@
 
 .course-cell.selectedA {
     background: #bbdefb;
-    /* border: 1px solid #2196F3; */
     box-shadow: 0 10px rgba(33, 150, 243, 0.3);
 }
 
 .course-cell.selectedB {
-    background: #81ed7dc9;
+    background: #6dca6a;
 }
 
 .empty-cell:hover {
@@ -169,18 +168,92 @@
     max-width: 100%;
 }
 
+/* 調課單生成 */
 .exchange-panel {
-    padding: 0px 30px 40px;
+    margin: 0px 30px 40px;
+    box-shadow: 0 4px 6px rgba( 0, 0, 0, 0.1);
+    border-radius: 12px;
 }
 
 .exchange-panel-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 12px 12px 0 0;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    padding: 16px 20px;
 }
 
 .exchange-panel-body {
     background: white;
     border-radius: 0 0 12px 12px;
+    padding: 40px 20px;
+}
+
+.course-card-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 40px;
+    margin: 0 auto;
+    max-width: 900px;
+}
+
+.course-card-a-wrapper, 
+.course-card-b-wrapper {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba( 0, 0, 0, 0.1);
+    margin: 0 auto;
+}
+
+.course-card-a-header {
+    background: linear-gradient(135deg, #d8eeff 0%, #bbdefb 100%);
+}
+
+.course-card-b-header {
+    background: linear-gradient(135deg, #b5ecb3 0%, #6dca6a 100%);
+}
+
+.course-card-a-header,
+.course-card-b-header {
+    padding: 20px;
+    border-radius: 12px 12px 0px 0px;
+    font-size: 1.2em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: #434343;
+}
+
+.course-card-a-body, 
+.course-card-b-body {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 10px;
+    font-size: 1.1em;
+}
+
+.date-selector select {
+    width: 20%;
+    padding: 8px 0px 8px 0px;
+    font-size: 1.05em;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    color: #2c3e50;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.course-card-arrow {
+    font-size: 2em;
+}
+
+.date-selector-group {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    margin: 40px auto 0px;
+    max-width: 900px;
 }
 
 /* 響應式設計 */
