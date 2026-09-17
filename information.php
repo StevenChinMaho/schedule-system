@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>湖內國中調課查詢系統 - 網站資訊</title>
+    <title><?php echo htmlspecialchars(SCHOOL_NAME); ?>調課查詢系統 - 網站資訊</title>
     <link rel="stylesheet" href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
 </head>
 <body>
@@ -14,7 +14,7 @@
 
     <div class="container">
         <header class="page-header">
-            <h1>湖內國中 - 調課查詢系統</h1>
+            <h1><?php echo htmlspecialchars(SCHOOL_NAME); ?> - 調課查詢系統</h1>
             <div class="header-decoration"></div>
         </header>
 

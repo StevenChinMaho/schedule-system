@@ -36,6 +36,8 @@ services:
       DB_NAME: ${DB_NAME:?DB_NAME 未設定，請參考 .env.example 建立 .env}
       DB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
       DB_PASS: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
+      # 顯示用校名；未設定時沿用通用預設值，不影響啟動
+      SCHOOL_NAME: ${SCHOOL_NAME:-國中}
       TZ: Asia/Taipei
     volumes:
       - .:/var/www/html

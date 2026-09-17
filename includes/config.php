@@ -80,6 +80,12 @@ function require_env(string $name): string
     return $value;
 }
 
+/**
+ * 學校名稱，顯示於各頁標題與頁首。
+ * 非機密且不影響系統運作，故未設定時使用通用預設值而不中止。
+ */
+define('SCHOOL_NAME', getenv('SCHOOL_NAME') ?: '國中');
+
 define('DB_HOST', require_env('DB_HOST'));
 define('DB_NAME', require_env('DB_NAME'));
 define('DB_USER', require_env('DB_USER'));

@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>湖內國中調課查詢系統 - 首頁</title>
+    <title><?php echo htmlspecialchars(SCHOOL_NAME); ?>調課查詢系統 - 首頁</title>
     <link rel="stylesheet" href="css/frame.css?v=<?php echo $asset_versions["frame.css"];?>">
     <link rel="stylesheet" href="css/index-style.css?v=<?php echo $asset_versions["index-style.css"];?>">
     <script src="js/index.js?v=<?php echo $asset_versions["index.js"];?>" defer></script>
@@ -14,7 +14,7 @@
 <body>
     <div class="container">
         <header class="page-header">
-            <h1>湖內國中 - 調課查詢系統</h1>
+            <h1><?php echo htmlspecialchars(SCHOOL_NAME); ?> - 調課查詢系統</h1>
             <div class="header-decoration"></div>
             <p class="subtitle">請選擇要查詢的班級</p>
         </header>
