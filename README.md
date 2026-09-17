@@ -113,6 +113,44 @@ Tunnel 於 Cloudflare Dashboard 的 **Zero Trust → Networks → Tunnels** 建�
 接著匯入該校的課表資料即可。`class`、`teacher`、`subject`、`timeslot`、
 `schedule` 五張表的內容決定了該校的班級、年級與作息，系統會自動反映。
 
+## 更新課表
+
+排課系統匯出的班級課表 PDF 是含格線的文字表格，可直接解析，不需人工轉錄。
+一併提供教師課表時會做雙向交叉驗證：兩份文件由排課系統各自匯出，內容應互相
+吻合，任何不一致都會列出。
+
+**1. 在本機產生 SQL**（需要 pdfplumber，以容器執行最省事）
+
+```bash
+docker build -t pdftools tools/
+
+docker run --rm -v "$PWD:/work" -w /work pdftools \
+    python3 tools/schedule_pdf_to_sql.py 班級課表.pdf \
+        -t 教師課表.pdf \
+        -o database/schedules/<資料庫>.sql
+```
+
+檔名必須與該校的資料庫同名，匯入腳本依此尋找。產生的 SQL 不納入版控。
+
+**2. 送到伺服器**
+
+```bash
+scp database/schedules/<資料庫>.sql \
+    deploy@<伺服器>:/opt/schedule-system/database/schedules/
+```
+
+**3. 在伺服器上匯入**
+
+```bash
+cd /opt/schedule-system
+./database/import-schedule.sh <資料庫>
+```
+
+腳本會自動建立不存在的資料庫與資料表、顯示即將匯入的內容與將被覆蓋的筆數、
+待確認後才寫入，最後印出各資料表的筆數。加上 `-y` 可略過確認。
+
+意見回饋（`feedback`）不受影響，只有課表相關的五張表會被取代。
+
 ## 資料庫維護
 
 資料庫不對外開放 port，一律透過 `docker exec` 操作。注意指令最後要指定學校的
@@ -163,7 +201,11 @@ docker logs schedule-php 2>&1 | grep "School: hunei"
 ├── database/
 │   ├── schema.sql             資料表結構（每校各套用一份）
 │   ├── sample_data.sql        範例資料
-│   └── add-school.sh          建立新學校的資料庫
+│   ├── add-school.sh          建立新學校的資料庫
+│   ├── import-schedule.sh     匯入課表資料
+│   └── schedules/             各校課表 SQL（產生物，未納入版控）
+├── tools/
+│   └── schedule_pdf_to_sql.py 由課表 PDF 產生 SQL
 └── nginx/default.conf         Nginx 路由設定
 ```
 
