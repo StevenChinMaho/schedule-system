@@ -8,14 +8,12 @@ services:
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:?DB_ROOT_PASS 未設定，請參考 .env.example 建立 .env}
-      MARIADB_DATABASE: ${DB_NAME:?DB_NAME 未設定，請參考 .env.example 建立 .env}
+      # 僅建立應用程式帳號；各校資料庫與授權由 database/add-school.sh 建立
       MARIADB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
       MARIADB_PASSWORD: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
       TZ: Asia/Taipei
     volumes:
       - db-data:/var/lib/mysql
-      # 首次啟動（資料目錄為空）時自動建立資料表結構
-      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -31,13 +29,12 @@ services:
     container_name: hn-php
     restart: unless-stopped
     environment:
-      # 資料庫已在專案內，主機名固定為 hn-db，不需外部設定
+      # 資料庫已在專案內，主機名固定為 hn-db，不需外部設定。
+      # 要連往哪一個資料庫由 includes/schools.php 依請求網域決定，
+      # 故此處只提供共用的應用程式帳號。
       DB_HOST: hn-db
-      DB_NAME: ${DB_NAME:?DB_NAME 未設定，請參考 .env.example 建立 .env}
       DB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
       DB_PASS: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
-      # 顯示用校名；未設定時沿用通用預設值，不影響啟動
-      SCHOOL_NAME: ${SCHOOL_NAME:-國中}
       TZ: Asia/Taipei
     volumes:
       - .:/var/www/html

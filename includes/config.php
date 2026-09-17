@@ -2,68 +2,14 @@
 /**
  * 資料庫連線與共用設定。
  *
- * 連線資訊一律由環境變數提供（見 docker-compose.yaml 的 environment 區段），
- * 此檔案不含任何帳號密碼，可安全納入版本控制。
+ * 單一部署可服務多間學校：依照請求的網域自 includes/schools.php 找出對應的
+ * 學校，並連往該校專屬的資料庫。找不到對應網域時一律中止，不會退回任何預設
+ * 學校，以免將某校的資料顯示在未註冊的網域上。
+ *
+ * 資料庫帳號密碼由環境變數提供（見 docker-compose.yaml），此檔不含機密。
  */
 
-/**
- * 輸出 503 維護頁面並中止執行。
- */
-function render_maintenance_page(): never
-{
-    http_response_code(503);
-    header('Content-Type: text/html; charset=UTF-8');
-    echo <<<'HTML'
-    <!DOCTYPE html>
-    <html lang="zh-TW">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>系統維護中</title>
-        <style>
-            body {
-                font-family: "Microsoft JhengHei", sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                margin: 0;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            }
-            .error-container {
-                background: white;
-                padding: 40px;
-                border-radius: 16px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-                text-align: center;
-                max-width: 500px;
-            }
-            h1 { color: #e74c3c; margin-bottom: 20px; }
-            p  { color: #555; line-height: 1.6; }
-            .back-link {
-                display: inline-block;
-                margin-top: 20px;
-                padding: 12px 24px;
-                background: #667eea;
-                color: white;
-                text-decoration: none;
-                border-radius: 8px;
-                transition: all 0.3s;
-            }
-            .back-link:hover { background: #5568d3; transform: translateY(-2px); }
-        </style>
-    </head>
-    <body>
-        <div class="error-container">
-            <h1>⚠️ 系統暫時無法使用</h1>
-            <p>很抱歉，資料庫連線發生問題。請稍後再試，或聯繫系統管理員。</p>
-            <a href="index.php" class="back-link">返回首頁</a>
-        </div>
-    </body>
-    </html>
-    HTML;
-    exit;
-}
+require_once __DIR__ . '/error_page.php';
 
 /**
  * 讀取必要的環境變數，缺少時中止執行。
@@ -74,20 +20,49 @@ function require_env(string $name): string
 
     if ($value === false || $value === '') {
         error_log("設定錯誤: 環境變數 {$name} 未設定");
-        render_maintenance_page();
+        render_error_page('系統暫時無法使用', '系統設定不完整，請聯繫系統管理員。', 503);
     }
 
     return $value;
 }
 
 /**
- * 學校名稱，顯示於各頁標題與頁首。
- * 非機密且不影響系統運作，故未設定時使用通用預設值而不中止。
+ * 依請求的網域找出對應的學校設定。
  */
-define('SCHOOL_NAME', getenv('SCHOOL_NAME') ?: '國中');
+function resolve_school(array $schools, string $host): ?array
+{
+    // 去除連接埠並正規化，Host 標頭為用戶端提供，僅用於查表
+    $host = strtolower(explode(':', $host)[0]);
+
+    foreach ($schools as $key => $school) {
+        if (in_array($host, $school['hosts'], true)) {
+            return $school + ['key' => $key];
+        }
+    }
+
+    return null;
+}
+
+$school = resolve_school(
+    require __DIR__ . '/schools.php',
+    $_SERVER['HTTP_HOST'] ?? ''
+);
+
+if ($school === null) {
+    error_log('未註冊的網域: ' . ($_SERVER['HTTP_HOST'] ?? '(空)'));
+    render_error_page(
+        '網域尚未設定',
+        '此網域尚未對應到任何學校。若您認為這是錯誤，請聯繫系統管理員。',
+        404
+    );
+}
+
+define('SCHOOL_KEY', $school['key']);
+define('SCHOOL_NAME', $school['name']);
+define('SCHOOL_ACTIVITY_SLOTS', $school['activity_slots']);
 
 define('DB_HOST', require_env('DB_HOST'));
-define('DB_NAME', require_env('DB_NAME'));
+define('DB_NAME', $school['database']);
 define('DB_USER', require_env('DB_USER'));
 define('DB_PASS', require_env('DB_PASS'));
 
@@ -113,6 +88,10 @@ try {
         ]
     );
 } catch ( PDOException $e ) {
-    error_log("資料庫連線失敗: " . $e->getMessage());
-    render_maintenance_page();
+    error_log("資料庫連線失敗 (" . SCHOOL_KEY . "): " . $e->getMessage());
+    render_error_page(
+        '系統暫時無法使用',
+        '很抱歉，資料庫連線發生問題。請稍後再試，或聯繫系統管理員。',
+        503
+    );
 }
