@@ -20,8 +20,6 @@
 
         <div class="main-content">
             <h3>功能開發中...</h3>
-            <p>更新日誌: <br>10/18: 修正的所有班級禮拜四第五節錯誤顯示成公民與社會的問題。</p>
-
         </div>
 
         <footer class="page-footer">
