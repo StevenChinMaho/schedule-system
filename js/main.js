@@ -130,36 +130,30 @@ function clearTeacherSchedule()
     });
 }
 
+/**
+ * 依 scheduleConfig 給定的時段切換排除標記。
+ * 時段清單由 showSchedule.php 依當前學校的作息算出，各校節數與社團課
+ * 時間不同，故不在此判斷。
+ */
+function toggleExcluded( slotIds, className, enabled )
+{
+    const ids = slotIds.map(String);
+
+    classCells.forEach( cell => {
+        if ( ids.includes(cell.dataset.leftIndex) ) cell.classList.toggle(className, enabled);
+    });
+}
+
 periodChk.addEventListener( "change", function () {
     resetExchange();
 
-    if (periodChk.checked) {
-        classCells.forEach( cell => {
-            if (cell.dataset.leftIndex % 8 === 0) {
-                cell.classList.add("excludePeriod");
-            }
-        })
-    } else {
-        classCells.forEach( cell => {
-            if (cell.dataset.leftIndex % 8 === 0) cell.classList.remove("excludePeriod");
-        })
-    }
+    toggleExcluded( scheduleConfig.lastPeriodSlots, "excludePeriod", periodChk.checked );
 });
 
 classActiveChk.addEventListener( "change", function () {
     resetExchange();
 
-    if (classActiveChk.checked) {
-        classCells.forEach( cell => {
-            if (cell.dataset.leftIndex == 14 || cell.dataset.leftIndex == 15) {
-                cell.classList.add("excludeClassActive");
-            }
-        })
-    } else {
-        classCells.forEach( cell => {
-            if (cell.dataset.leftIndex == 14 || cell.dataset.leftIndex == 15) cell.classList.remove("excludeClassActive");
-        })
-    }
+    toggleExcluded( scheduleConfig.activitySlots, "excludeClassActive", classActiveChk.checked );
 });
 
 specialChk.addEventListener("change", resetExchange);

@@ -1,7 +1,55 @@
 <?php
     require_once('includes/config.php');
 
-    $class_id = (int)$_GET['class_id'] > 0 && (int)$_GET['class_id'] <= 12 ? $_GET['class_id'] : '1';
+    /**
+     * 將星期數字轉為中文標籤，例如 1 -> 一。
+     */
+    function weekday_label( int $weekday ): string
+    {
+        $numerals = [1 => '一', '二', '三', '四', '五', '六', '日'];
+
+        return $numerals[$weekday] ?? (string)$weekday;
+    }
+
+    // 班級以資料庫為準，找不到就退回該校的第一個班級
+    $stmt = $pdo->prepare("SELECT class_id, class_name, class_code FROM class WHERE class_id = ?");
+    $stmt->execute([ (int)( $_GET['class_id'] ?? 0 ) ]);
+    $class = $stmt->fetch();
+
+    if ( $class === false )
+    {
+        $class = $pdo->query("SELECT class_id, class_name, class_code FROM class ORDER BY class_code LIMIT 1")->fetch();
+    }
+
+    if ( $class === false )
+    {
+        render_error_page('尚無課表資料', '此學校尚未匯入班級資料，請聯繫系統管理員。', 503);
+    }
+
+    $class_id = $class["class_id"];
+    $class_name = $class["class_name"];
+    $class_code = $class["class_code"];
+
+    /*
+     * 課表的天數與每日節數直接由 timeslot 資料表推得，不寫死在程式裡，
+     * 各校作息不同時無須改動程式碼。
+     *
+     * $slot_ids[節次][星期] 存放真正的 timeslot_id，供表格儲存格使用；
+     * 過去是以 (星期-1)*8+節次 推算，等同假設 timeslot_id 必須照該公式編號。
+     */
+    $timeslots = $pdo->query("SELECT timeslot_id, weekday, period FROM timeslot")->fetchAll();
+
+    $slot_ids = [];
+    $max_period = 0;
+    $max_weekday = 0;
+
+    foreach( $timeslots as $slot )
+    {
+        $slot_ids[ $slot["period"] ][ $slot["weekday"] ] = $slot["timeslot_id"];
+
+        $max_period = max( $max_period, (int)$slot["period"] );
+        $max_weekday = max( $max_weekday, (int)$slot["weekday"] );
+    }
 
     $stmt = $pdo->prepare("SELECT 
         tea.teacher_id, 
@@ -31,27 +79,27 @@
     {
         if( $course['class_id'] == $class_id )
         {
-            if( !isset($class_schedule[$course['period']][$course['weekday']]) )
-            {
-                $class_schedule[$course['period']][$course['weekday']] = [
-                    "timeslot_id" => $course["timeslot_id"],
-                    "subject_name" => $course["subject_name"],
-                    "teacher_name" => $course["teacher_name"],
-                    "teacher_id" => $course["teacher_id"]
-                ];
-            }
-            else
-            {
-                echo '<script> alert("警告：課表重複"); </script>';
-            }
+            $class_schedule[$course['period']][$course['weekday']] = [
+                "timeslot_id" => $course["timeslot_id"],
+                "subject_name" => $course["subject_name"],
+                "teacher_name" => $course["teacher_name"],
+                "teacher_id" => $course["teacher_id"]
+            ];
         }
     }
 
-    $stmt = $pdo->prepare("SELECT class_name, class_code FROM class WHERE class_id = ?");
-    $stmt->execute([$class_id]);
-    $result = $stmt->fetchAll();
-    $class_name = $result[0]["class_name"];
-    $class_code = $result[0]["class_code"];
+    // 「排除最後一節」與「排除社團課與班級活動」所對應的實際時段
+    $last_period_slots = array_values( $slot_ids[$max_period] ?? [] );
+
+    $activity_slots = [];
+
+    foreach( SCHOOL_ACTIVITY_SLOTS as [$weekday, $period] )
+    {
+        if( isset($slot_ids[$period][$weekday]) )
+        {
+            $activity_slots[] = $slot_ids[$period][$weekday];
+        }
+    }
 
     /**
      * 記錄課表查詢。輸出至 stderr，由容器的 log driver 收集：
@@ -63,7 +111,8 @@
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
 
         error_log(sprintf(
-            "ACCESS | IP: %s | Class: %s | UA: %s",
+            "ACCESS | School: %s | IP: %s | Class: %s | UA: %s",
+            SCHOOL_KEY,
             $ip,
             $class_id,
             $user_agent
@@ -95,7 +144,7 @@
             <div class="control-content">
                 <div class="control-item">
                     <input type="checkbox" id="periodChk" class="toggle-checkbox">
-                    <label for="periodChk" class="toggle-text">排除第八節</label>
+                    <label for="periodChk" class="toggle-text">排除第<?php echo htmlspecialchars($max_period); ?>節</label>
                 </div>
 
                 <div class="control-item">
@@ -117,33 +166,40 @@
                     <thead>
                         <tr>
                             <th class='period-header'>節次</th>
-                            <th>一</th>
-                            <th>二</th>
-                            <th>三</th>
-                            <th>四</th>
-                            <th>五</th>
+                            <?php for( $w = 1; $w <= $max_weekday; $w++ ): ?>
+                                <th><?php echo htmlspecialchars(weekday_label($w)); ?></th>
+                            <?php endfor; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                            for( $p = 1; $p <= 8; $p++ )
+                            for( $p = 1; $p <= $max_period; $p++ )
                             {
                                 echo "<tr>";
                                 echo "<td class='period-cell'>$p</td>";
-                                
-                                for( $w = 1; $w <= 5; $w++ ) 
+
+                                for( $w = 1; $w <= $max_weekday; $w++ ) 
                                 {
+                                    // 該校此時段不存在（例如某天節數較少）
+                                    if( !isset($slot_ids[$p][$w]) )
+                                    {
+                                        echo "<td class='course-cell empty-cell'></td>";
+                                        continue;
+                                    }
+
+                                    $index = htmlspecialchars( $slot_ids[$p][$w] );
+
                                     if( isset($class_schedule[$p][$w]) )
                                     {
-                                        $c = &$class_schedule[$p][$w];
-                                        echo "<td class='course-cell class-cell' data-left-index='" . ($w - 1) * 8 + $p . "' data-tid='". htmlspecialchars( $c['teacher_id'] ) ."'>"; 
+                                        $c = $class_schedule[$p][$w];
+                                        echo "<td class='course-cell class-cell' data-left-index='" . $index . "' data-tid='". htmlspecialchars( $c['teacher_id'] ) ."'>"; 
                                         echo "<div class='subject-name'>" . htmlspecialchars($c['subject_name']) . "</div>";
                                         echo "<div class='teacher-name'>" . htmlspecialchars($c['teacher_name']) . "</div>"; 
                                         echo "</td>";
                                     }
                                     else
                                     {
-                                        echo "<td class='course-cell class-cell empty-cell' data-left-index='" . ($w - 1) * 8 + $p . "'></td>";
+                                        echo "<td class='course-cell class-cell empty-cell' data-left-index='" . $index . "'></td>";
                                     }
                                 }
                                 echo "</tr>";
@@ -159,23 +215,27 @@
                     <thead>
                         <tr>
                             <th class='period-header'>節次</th>
-                            <th>一</th>
-                            <th>二</th>
-                            <th>三</th>
-                            <th>四</th>
-                            <th>五</th>
+                            <?php for( $w = 1; $w <= $max_weekday; $w++ ): ?>
+                                <th><?php echo htmlspecialchars(weekday_label($w)); ?></th>
+                            <?php endfor; ?>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
-                            for( $p = 1; $p <= 8; $p++ )
+                            for( $p = 1; $p <= $max_period; $p++ )
                             {
                                 echo "<tr>";
                                 echo "<td class='period-cell'>$p</td>";
 
-                                for( $w = 1; $w <= 5; $w++ ) 
+                                for( $w = 1; $w <= $max_weekday; $w++ ) 
                                 {
-                                    echo "<td class='course-cell teacher-cell empty-cell' data-right-index='" . ($w - 1) * 8 + $p . "'></td>";
+                                    if( !isset($slot_ids[$p][$w]) )
+                                    {
+                                        echo "<td class='course-cell empty-cell'></td>";
+                                        continue;
+                                    }
+
+                                    echo "<td class='course-cell teacher-cell empty-cell' data-right-index='" . htmlspecialchars( $slot_ids[$p][$w] ) . "'></td>";
                                 }
                                 echo "</tr>";
                             }
@@ -194,7 +254,13 @@
         </footer>
     </div>
     <script>
-        const rawSchedule = <?php echo json_encode( $raw_schedule, JSON_UNESCAPED_UNICODE ); ?>
+        const rawSchedule = <?php echo json_encode( $raw_schedule, JSON_UNESCAPED_UNICODE ); ?>;
+
+        // 各校作息不同，兩個排除選項對應的實際時段由後端算出
+        const scheduleConfig = {
+            lastPeriodSlots: <?php echo json_encode( $last_period_slots ); ?>,
+            activitySlots: <?php echo json_encode( $activity_slots ); ?>
+        };
     </script>
 </body>
 </html>
