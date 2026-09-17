@@ -1,10 +1,14 @@
+# 明確指定專案名稱，網路與 volume 皆以此為前綴（schedule-system_db-data）。
+# 未指定時 compose 會採用目錄名稱，屆時目錄改名會讓既有的資料庫 volume 被孤立。
+name: schedule-system
+
 services:
   # 1. MariaDB 資料庫
   #    僅掛在 internal 的 backend 網路上，不開放任何 port，
-  #    除了 hn-php 之外沒有任何容器（含 tunnel）連得到它。
-  hn-db:
+  #    除了 schedule-php 之外沒有任何容器（含 tunnel）連得到它。
+  schedule-db:
     image: mariadb:10.11
-    container_name: hn-db
+    container_name: schedule-db
     restart: unless-stopped
     environment:
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:?DB_ROOT_PASS 未設定，請參考 .env.example 建立 .env}
@@ -24,31 +28,31 @@ services:
       - backend
 
   # 2. PHP-FPM 後端處理容器
-  hn-php:
+  schedule-php:
     build: .
-    container_name: hn-php
+    container_name: schedule-php
     restart: unless-stopped
     environment:
-      # 資料庫已在專案內，主機名固定為 hn-db，不需外部設定。
+      # 資料庫已在專案內，主機名固定為 schedule-db，不需外部設定。
       # 要連往哪一個資料庫由 includes/schools.php 依請求網域決定，
       # 故此處只提供共用的應用程式帳號。
-      DB_HOST: hn-db
+      DB_HOST: schedule-db
       DB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
       DB_PASS: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
       TZ: Asia/Taipei
     volumes:
       - .:/var/www/html
     depends_on:
-      hn-db:
+      schedule-db:
         condition: service_healthy
     networks:
       - frontend
       - backend
 
   # 3. Nginx 網頁入口容器
-  hn-web:
+  schedule-web:
     image: nginx:stable-alpine
-    container_name: hn-web
+    container_name: schedule-web
     restart: unless-stopped
     environment:
       TZ: Asia/Taipei
@@ -56,30 +60,30 @@ services:
       - .:/var/www/html:ro
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - hn-php
+      - schedule-php
     networks:
       - frontend
 
   # 4. Cloudflare Tunnel
   #    對外的唯一出入口；主機不需開放任何 port。
-  #    路由設定（hostname -> http://hn-web:80）在 Cloudflare Dashboard 上維護。
-  hn-tunnel:
+  #    路由設定（hostname -> http://schedule-web:80）在 Cloudflare Dashboard 上維護。
+  schedule-tunnel:
     image: cloudflare/cloudflared:latest
-    container_name: hn-tunnel
+    container_name: schedule-tunnel
     restart: unless-stopped
     command: tunnel --no-autoupdate run
     environment:
       TUNNEL_TOKEN: ${TUNNEL_TOKEN:?TUNNEL_TOKEN 未設定，請參考 .env.example 建立 .env}
       TZ: Asia/Taipei
     depends_on:
-      - hn-web
+      - schedule-web
     networks:
       - frontend
 
 networks:
   # 對外連線與容器間的 HTTP 流量
   frontend:
-  # 資料庫專用；internal 表示此網路不具對外路由，hn-db 無法連上網際網路
+  # 資料庫專用；internal 表示此網路不具對外路由，schedule-db 無法連上網際網路
   backend:
     internal: true
 

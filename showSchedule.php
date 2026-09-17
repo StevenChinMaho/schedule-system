@@ -103,7 +103,7 @@
 
     /**
      * 記錄課表查詢。輸出至 stderr，由容器的 log driver 收集：
-     * 以 `docker logs hn-php` 檢視。
+     * 以 `docker logs schedule-php` 檢視。
      */
     function log_access($class_id) 
     {

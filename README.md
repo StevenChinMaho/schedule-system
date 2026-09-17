@@ -34,18 +34,18 @@
 
 ```
              ┌──────── frontend ────────┐   ┌─ backend (internal) ─┐
-Internet ─▶ hn-tunnel ─▶ hn-web ─▶ hn-php ───────────────────▶ hn-db
+Internet ─▶ schedule-tunnel ─▶ schedule-web ─▶ schedule-php ───────────────────▶ schedule-db
             cloudflared   nginx    php-fpm                     mariadb
 ```
 
 | 容器 | 用途 | 對外 |
 | --- | --- | --- |
-| `hn-tunnel` | Cloudflare Tunnel，唯一的對外出入口 | 主動外連 |
-| `hn-web` | Nginx，靜態檔與 PHP 路由 | 否 |
-| `hn-php` | PHP-FPM | 否 |
-| `hn-db` | MariaDB，資料持久化於 `db-data` volume | 否 |
+| `schedule-tunnel` | Cloudflare Tunnel，唯一的對外出入口 | 主動外連 |
+| `schedule-web` | Nginx，靜態檔與 PHP 路由 | 否 |
+| `schedule-php` | PHP-FPM | 否 |
+| `schedule-db` | MariaDB，資料持久化於 `db-data` volume | 否 |
 
-主機不需開放任何 port。`backend` 網路設為 `internal`，資料庫既連不上網際網路，也無法被 `hn-tunnel` 存取。
+主機不需開放任何 port。`backend` 網路設為 `internal`，資料庫既連不上網際網路，也無法被 `schedule-tunnel` 存取。
 
 ### 多校運作方式
 
@@ -87,7 +87,7 @@ TUNNEL_TOKEN=<Cloudflare Dashboard 取得的 tunnel token>
 
 Tunnel 於 Cloudflare Dashboard 的 **Zero Trust → Networks → Tunnels** 建立。
 每間學校在同一條 tunnel 底下各新增一個 public hostname，service 一律指向
-`http://hn-web:80`；路由設定全部留在 Dashboard 上，專案內不需維護設定檔。
+`http://schedule-web:80`；路由設定全部留在 Dashboard 上，專案內不需維護設定檔。
 
 ## 新增一間學校
 
@@ -108,7 +108,7 @@ Tunnel 於 Cloudflare Dashboard 的 **Zero Trust → Networks → Tunnels** 建�
 ],
 ```
 
-3. 於 Cloudflare Tunnel 新增該網域，service 指向 `http://hn-web:80`
+3. 於 Cloudflare Tunnel 新增該網域，service 指向 `http://schedule-web:80`
 
 接著匯入該校的課表資料即可。`class`、`teacher`、`subject`、`timeslot`、
 `schedule` 五張表的內容決定了該校的班級、年級與作息，系統會自動反映。
@@ -120,18 +120,18 @@ Tunnel 於 Cloudflare Dashboard 的 **Zero Trust → Networks → Tunnels** 建�
 
 ```bash
 # 進入某校的 SQL shell
-docker exec -it hn-db mariadb -u root -p sch_hunei
+docker exec -it schedule-db mariadb -u root -p sch_hunei
 
 # 備份單一學校
-docker exec hn-db mariadb-dump -u root -p"$DB_ROOT_PASS" \
+docker exec schedule-db mariadb-dump -u root -p"$DB_ROOT_PASS" \
     --single-transaction sch_hunei > hunei-$(date +%F).sql
 
 # 備份全部學校
-docker exec hn-db mariadb-dump -u root -p"$DB_ROOT_PASS" \
+docker exec schedule-db mariadb-dump -u root -p"$DB_ROOT_PASS" \
     --single-transaction --all-databases > all-$(date +%F).sql
 
 # 還原
-docker exec -i hn-db mariadb -u root -p"$DB_ROOT_PASS" sch_hunei < backup.sql
+docker exec -i schedule-db mariadb -u root -p"$DB_ROOT_PASS" sch_hunei < backup.sql
 ```
 
 ## 日誌
@@ -139,13 +139,13 @@ docker exec -i hn-db mariadb -u root -p"$DB_ROOT_PASS" sch_hunei < backup.sql
 各容器的日誌皆輸出至標準輸出，以 `docker logs` 檢視。課表查詢記錄會標示學校：
 
 ```bash
-docker logs -f hn-php      # PHP 錯誤與課表查詢記錄
-docker logs -f hn-web      # Nginx 存取日誌
-docker logs -f hn-db       # 資料庫
-docker logs -f hn-tunnel   # Tunnel 連線狀態
+docker logs -f schedule-php      # PHP 錯誤與課表查詢記錄
+docker logs -f schedule-web      # Nginx 存取日誌
+docker logs -f schedule-db       # 資料庫
+docker logs -f schedule-tunnel   # Tunnel 連線狀態
 
 # 只看某一校
-docker logs hn-php 2>&1 | grep "School: hunei"
+docker logs schedule-php 2>&1 | grep "School: hunei"
 ```
 
 ## 專案結構

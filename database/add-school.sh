@@ -43,13 +43,13 @@ if [ -z "$DB_ROOT_PASS" ] || [ -z "$DB_USER" ]; then
     exit 1
 fi
 
-if ! docker ps --format '{{.Names}}' | grep -qx hn-db; then
-    echo "錯誤: hn-db 容器未執行，請先 docker compose up -d" >&2
+if ! docker ps --format '{{.Names}}' | grep -qx schedule-db; then
+    echo "錯誤: schedule-db 容器未執行，請先 docker compose up -d" >&2
     exit 1
 fi
 
 run_sql() {
-    docker exec -i hn-db mariadb -u root -p"$DB_ROOT_PASS" "$@"
+    docker exec -i schedule-db mariadb -u root -p"$DB_ROOT_PASS" "$@"
 }
 
 echo "建立資料庫 ${DB} 並授權給 ${DB_USER}..."
@@ -76,4 +76,4 @@ fi
 echo
 echo "接下來："
 echo "  1. 於 includes/schools.php 加入此校設定（database 填 ${DB}）"
-echo "  2. 於 Cloudflare Tunnel 新增該校網域，service 指向 http://hn-web:80"
+echo "  2. 於 Cloudflare Tunnel 新增該校網域，service 指向 http://schedule-web:80"

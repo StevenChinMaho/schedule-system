@@ -8,7 +8,7 @@
  * 新增一間學校的步驟：
  *   1. 在下方加入一筆設定
  *   2. 執行 database/add-school.sh <database> 建立資料庫與資料表
- *   3. 於 Cloudflare Tunnel 新增該網域，service 指向 http://hn-web:80
+ *   3. 於 Cloudflare Tunnel 新增該網域，service 指向 http://schedule-web:80
  *
  * 此檔不含任何密碼，可安全納入版本控制。
  *
