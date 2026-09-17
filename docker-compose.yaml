@@ -1,0 +1,88 @@
+services:
+  # 1. MariaDB 資料庫
+  #    僅掛在 internal 的 backend 網路上，不開放任何 port，
+  #    除了 hn-php 之外沒有任何容器（含 tunnel）連得到它。
+  hn-db:
+    image: mariadb:10.11
+    container_name: hn-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASS:?DB_ROOT_PASS 未設定，請參考 .env.example 建立 .env}
+      MARIADB_DATABASE: ${DB_NAME:?DB_NAME 未設定，請參考 .env.example 建立 .env}
+      MARIADB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
+      MARIADB_PASSWORD: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
+      TZ: Asia/Taipei
+    volumes:
+      - db-data:/var/lib/mysql
+      # 首次啟動（資料目錄為空）時自動建立資料表結構
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    networks:
+      - backend
+
+  # 2. PHP-FPM 後端處理容器
+  hn-php:
+    build: .
+    container_name: hn-php
+    restart: unless-stopped
+    environment:
+      # 資料庫已在專案內，主機名固定為 hn-db，不需外部設定
+      DB_HOST: hn-db
+      DB_NAME: ${DB_NAME:?DB_NAME 未設定，請參考 .env.example 建立 .env}
+      DB_USER: ${DB_USER:?DB_USER 未設定，請參考 .env.example 建立 .env}
+      DB_PASS: ${DB_PASS:?DB_PASS 未設定，請參考 .env.example 建立 .env}
+      TZ: Asia/Taipei
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      hn-db:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+
+  # 3. Nginx 網頁入口容器
+  hn-web:
+    image: nginx:stable-alpine
+    container_name: hn-web
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+    volumes:
+      - .:/var/www/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - hn-php
+    networks:
+      - frontend
+
+  # 4. Cloudflare Tunnel
+  #    對外的唯一出入口；主機不需開放任何 port。
+  #    路由設定（hostname -> http://hn-web:80）在 Cloudflare Dashboard 上維護。
+  hn-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: hn-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?TUNNEL_TOKEN 未設定，請參考 .env.example 建立 .env}
+      TZ: Asia/Taipei
+    depends_on:
+      - hn-web
+    networks:
+      - frontend
+
+networks:
+  # 對外連線與容器間的 HTTP 流量
+  frontend:
+  # 資料庫專用；internal 表示此網路不具對外路由，hn-db 無法連上網際網路
+  backend:
+    internal: true
+
+volumes:
+  db-data:

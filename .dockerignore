@@ -1,0 +1,25 @@
+# 版本控制與編輯器設定
+.git
+.gitignore
+.gitattributes
+.editorconfig
+
+# 機密設定（DB 密碼透過 compose 的 environment 注入，不進 image）
+.env
+.env.example
+
+# 原始課表資料與資料庫備份，不需要進容器
+課表PDF/
+database/
+
+# 執行期產物
+logs/
+
+# 容器自身的設定檔（由 compose 掛載，不需進 build context）
+Dockerfile
+.dockerignore
+docker-compose.yaml
+nginx/
+
+# 文件
+README.md

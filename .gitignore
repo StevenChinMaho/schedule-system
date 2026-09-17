@@ -1,5 +1,4 @@
 /課表PDF/
-/includes/config.php
-.htaccess
 /logs/
-/vendor/
+.htaccess
+.env
