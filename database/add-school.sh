@@ -48,6 +48,24 @@ if ! docker ps --format '{{.Names}}' | grep -qx schedule-db; then
     exit 1
 fi
 
+# 容器剛啟動時資料庫尚未接受連線，等待 healthcheck 通過再繼續
+for _ in $(seq 60); do
+    [ "$(docker inspect -f '{{.State.Health.Status}}' schedule-db 2>/dev/null)" = "healthy" ] && break
+    sleep 1
+done
+
+if [ "$(docker inspect -f '{{.State.Health.Status}}' schedule-db 2>/dev/null)" != "healthy" ]; then
+    echo "錯誤: schedule-db 等待逾時仍未就緒，請檢查 docker logs schedule-db" >&2
+    exit 1
+fi
+
+# 查詢用：不加 -i，否則 docker exec 會吃掉 stdin，
+# 連帶影響呼叫端後續的互動輸入。
+query_sql() {
+    docker exec schedule-db mariadb -u root -p"$DB_ROOT_PASS" "$@" </dev/null
+}
+
+# 匯入用：需要從 stdin 讀入 SQL
 run_sql() {
     docker exec -i schedule-db mariadb -u root -p"$DB_ROOT_PASS" "$@"
 }
@@ -62,7 +80,7 @@ SQL
 
 # schema.sql 的 CREATE TABLE 不含 IF NOT EXISTS，重複套用會失敗，
 # 因此已有資料表時就跳過，讓這支腳本可以安全重跑
-TABLE_COUNT="$(run_sql -N -B -e \
+TABLE_COUNT="$(query_sql -N -B -e \
     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${DB}';")"
 
 if [ "$TABLE_COUNT" -gt 0 ]; then
