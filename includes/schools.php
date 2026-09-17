@@ -6,14 +6,15 @@
  * 各校資料在資料庫層完全分離。
  *
  * 新增一間學校的步驟：
- *   1. 在下方加入一筆設定
- *   2. 執行 database/add-school.sh <database> 建立資料庫與資料表
+ *   1. 在下方加入一筆設定並提交
+ *   2. 於伺服器 git pull，執行 database/add-school.sh <database>
  *   3. 於 Cloudflare Tunnel 新增該網域，service 指向 http://schedule-web:80
  *
- * 此檔不含任何密碼，可安全納入版本控制。
+ * 此檔不含任何密碼，納入版本控制，伺服器端不應直接修改 ——
+ * 需要本機測試網域或臨時覆寫時，請改用下方的 schools.local.php。
  *
  * 欄位說明：
- *   hosts     該校使用的網域，可填多個（例如正式網域與測試網域）
+ *   hosts     該校使用的網域，可填多個（正式網域與本機開發網域可並存）
  *   name      顯示於頁面標題與頁首的校名
  *   database  該校專屬的資料庫名稱
  *   activity_slots
@@ -22,11 +23,31 @@
  *
  * 課表的天數與每日節數不在此設定，系統會直接從該校 timeslot 資料表推得。
  */
-return [
-    'hunei' => [
-        'hosts' => ['schedule.example.tw'],
+$schools = [
+    'hn' => [
+        'hosts' => ['hn-schedule.kururinpa.dev', 'hn.localhost'],
         'name' => '湖內國中',
-        'database' => 'sch_hunei',
+        'database' => 'hn_schedule',
         'activity_slots' => [[2, 6], [2, 7]],
     ],
+    'yjm' => [
+        'hosts' => ['yjm-schedule.kururinpa.dev', 'yjm.localhost'],
+        'name' => '一甲國中',
+        'database' => 'yjm_schedule',
+        // 班會／自主為週五第六節、社團為週五第七節
+        'activity_slots' => [[5, 6], [5, 7]],
+    ],
 ];
+
+/*
+ * 本機覆寫：存在 schools.local.php 時，其內容會依學校代號覆寫或新增上表。
+ * 供開發與臨時測試使用，不納入版本控制，因此不會與 git pull 衝突。
+ */
+$local = __DIR__ . '/schools.local.php';
+
+if ( file_exists($local) )
+{
+    $schools = array_replace( $schools, require $local );
+}
+
+return $schools;

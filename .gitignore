@@ -7,3 +7,6 @@
 # 各校內容不同、且每學期更換，不納入版控；
 # 目錄本身保留，作為 scp 的目標位置。
 /database/schedules/*.sql
+
+# 本機覆寫用的學校註冊表（見 includes/schools.php 末段）
+/includes/schools.local.php

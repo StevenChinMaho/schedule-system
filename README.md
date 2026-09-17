@@ -91,27 +91,52 @@ Tunnel 於 Cloudflare Dashboard 的 **Zero Trust → Networks → Tunnels** 建�
 
 ## 新增一間學校
 
-三個步驟，不需要改動任何程式邏輯：
-
-```bash
-# 1. 建立該校專屬資料庫並套用資料表結構（可重複執行）
-./database/add-school.sh sch_newschool
-```
+學校註冊表 [includes/schools.php](includes/schools.php) 納入版本控制，
+**設定改在 repo、不要在伺服器上直接編輯**，否則之後 `git pull` 會衝突。
 
 ```php
-// 2. 於 includes/schools.php 加入一筆
+// 1. 於 includes/schools.php 加入一筆並提交
 'newschool' => [
-    'hosts' => ['schedule-new.example.tw'],
+    'hosts' => ['schedule-new.example.tw', 'newschool.localhost'],
     'name' => '新設國中',
-    'database' => 'sch_newschool',
+    'database' => 'new_schedule',
     'activity_slots' => [[2, 6], [2, 7]],   // 週二第 6、7 節，無則留空陣列
 ],
 ```
 
+```bash
+# 2. 於伺服器取得設定並建立資料庫
+cd /opt/schedule-system && git pull
+./database/add-school.sh new_schedule
+```
+
 3. 於 Cloudflare Tunnel 新增該網域，service 指向 `http://schedule-web:80`
 
-接著匯入該校的課表資料即可。`class`、`teacher`、`subject`、`timeslot`、
-`schedule` 五張表的內容決定了該校的班級、年級與作息，系統會自動反映。
+接著依下節匯入該校的課表資料即可。`class`、`teacher`、`subject`、
+`timeslot`、`schedule` 五張表的內容決定了該校的班級、年級與作息，
+系統會自動反映。
+
+`hosts` 可填多個網域，所以正式網域與本機開發用的網域能並存於同一筆設定，
+不需要為了開發另外準備一份檔案。
+
+### 本機覆寫
+
+若需要臨時調整而不想動到版本控制中的檔案，可建立
+`includes/schools.local.php`，其內容會依學校代號覆寫或新增註冊表：
+
+```php
+<?php
+return [
+    'yjm' => [
+        'hosts' => ['demo.localhost'],
+        'name' => '測試用',
+        'database' => 'yjm_schedule',
+        'activity_slots' => [],
+    ],
+];
+```
+
+該檔不納入版本控制，因此不會與 `git pull` 衝突。未列出的學校維持原設定。
 
 ## 更新課表
 
@@ -195,6 +220,7 @@ docker logs schedule-php 2>&1 | grep "School: hunei"
 ├── information.php            網站資訊與更新日誌
 ├── includes/
 │   ├── schools.php            學校註冊表：網域 → 資料庫與校本設定
+│   ├── schools.local.php      本機覆寫（選用，未納入版控）
 │   ├── config.php             依網域選定學校並建立資料庫連線
 │   └── error_page.php         共用的錯誤頁面
 ├── css/ js/                   前端樣式與腳本
